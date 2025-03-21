@@ -1,0 +1,27 @@
+{
+    
+    "Usuarios": [
+        {
+            "id": "PREQUEMADO",
+            "nombre": "Juan",
+            "apellido": "Pérez",
+            "email": "juan.perez@example.com",
+            "contraseña": "contraseña123",
+            "rol": "cliente",
+            "telefono": "1234567890",
+            "direccion": "Calle Falsa 123"
+        },
+        {
+            "id": "PREQUEMADO",
+            "nombre": "Allan",
+            "apellido": "José",
+            "email": "velezalan34@gmail.com",
+            "contraseña": "lsdisfun34",
+            "rol": "admin",
+            "telefono": "84813021",
+            "direccion": "San Jeronimo del Espiritu Santo, Macanona, Esparza, Puntarenas"
+        }
+        
+        
+    ]
+}
