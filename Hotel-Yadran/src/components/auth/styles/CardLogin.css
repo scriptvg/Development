@@ -1,0 +1,32 @@
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.formLogin {
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+}
+
+.img {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 1rem;
+}
+
+.text-login {
+    margin-top: 1rem;
+}
+
+.link-login {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.link-login:hover {
+    text-decoration: underline;
+}

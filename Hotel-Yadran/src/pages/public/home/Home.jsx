@@ -1,11 +1,16 @@
 import React from 'react'
+import BarraNav from '../../../components/home/BarraNav' 
 
 function Home() {
   return (
-    <div>
-        <h1>Hola</h1>
-    </div>
+<>
+
+    <BarraNav/>
+
+
+</>
   )
 }
+
 
 export default Home

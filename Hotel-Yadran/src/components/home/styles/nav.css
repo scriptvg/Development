@@ -1,0 +1,26 @@
+.navbar {
+    background-color: white;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.line-vertical {
+    display: none;
+}
+
+.auth-button {
+    min-width: 120px;
+}
+
+.welcome-text {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+@media (max-width: 991px) {
+    .line-vertical {
+        display: block;
+        margin: 1rem 0;
+    }
+}

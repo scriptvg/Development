@@ -1,4 +1,4 @@
-const BASE_URL = 'http://nuevo-endpoint.com/api/users'; // Cambia esta URL a tu nuevo endpoint
+const BASE_URL = 'http://localhost:3001/Usuarios';
 
 async function GetUsers() {
     try {
