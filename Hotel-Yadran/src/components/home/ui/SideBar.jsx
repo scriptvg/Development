@@ -8,8 +8,8 @@ function SideBar({ show, handleClose }) {
 
   const crudMenuItems = [
     { label: 'Dashboard', path: '/dashboard' },
-    { label: 'Crear Servicio', path: '/services/create' },
-    { label: 'Editar Servicio', path: '/services/edit' },
+    { label: 'Reservas', path: '/dashboard/reservas' },
+    { label: 'Habitaciones', path: '/dashboard/habitaciones' },
     { label: 'Eliminar Servicio', path: '/services/delete' },
   ];
 

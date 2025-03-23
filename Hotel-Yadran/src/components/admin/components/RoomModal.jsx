@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Container } from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap/dist/js/bootstrap.bundle.min.js"
 import BadgeComponent from '../../test/BadgeComponent';
@@ -111,15 +111,10 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
         { value: 'bano_privado', label: 'Baño Privado', icon: <Bath size={18} /> }
     ];
 
-    const handleServiceChange = (e) => {
-        const { value, checked } = e.target;
-        let updatedServices;
-        
-        if (checked) {
-            updatedServices = [...services, value];
-        } else {
-            updatedServices = services.filter(service => service !== value);
-        }
+    const handleServiceChange = (serviceValue) => {
+        const updatedServices = services.includes(serviceValue)
+            ? services.filter(service => service !== serviceValue)
+            : [...services, serviceValue];
         
         handleInputChange({ target: { name: 'services', value: updatedServices } });
     };
@@ -302,45 +297,32 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                     </Form.Group>
                 </Form>
                 
-                <div className="form-section services-section mt-4 pt-4 border-top">
-                    <Form.Group controlId="formRoomServices">
-                        <Form.Label className="h5 mb-3 text-primary">Servicios Disponibles</Form.Label>
-                        <div className="row g-3">
-                        {servicesList.map(service => (
-                                <div className="col-md-6" key={service.value}>
-                            <Form.Check
-                                type="checkbox"
-                                        label={<span className="fs-6 d-flex align-items-center">
-                                            <span className="text-primary">{service.icon}</span>
-                                            <span className="ms-2">{service.label}</span>
-                                        </span>}
-                                value={service.value}
-                                checked={services.includes(service.value)}
-                                onChange={handleServiceChange}
-                                        className="py-2 custom-checkbox"
-                            />
-                                </div>
-                        ))}
-                        </div>
-                    </Form.Group>
+                <Container className="form-section services-section mt-4 pt-4 border-top">
+                    <Container className='mb-3 shadow'>
+                            <Form.Group controlId="formRoomServices">
+                            
+                            <Form.Label className="h5 mb-3 text-primary">Servicios Disponibles</Form.Label>
+
+                            {servicesList.map(service => (
+                                    <div className="col-md-6" key={service.value}>
+                                        <BadgeComponent
+                                            text={service.label}
+                                            variant={services.includes(service.value) ? 'info' : 'secondary'}
+                                            icon={service.icon}
+                                            onClick={() => handleServiceChange(service.value)}
+                                            className="cursor-pointer"
+                                        />
+                                    </div>
+                                ))}
+
+                        </Form.Group>
+                    </Container>
+                
+                    </Container>
                     
-                    <Form.Group controlId="formRoomSelectedServices" className="mt-4">
-                        <Form.Label className="h5 mb-3 text-primary">Servicios Seleccionados</Form.Label>
-                        <div className="d-flex flex-wrap gap-2">
-                            {services.map(service => (
-                                <BadgeComponent 
-                                    key={service} 
-                                    text={service} 
-                                    variant="info" 
-                                    icon={getServiceIcon(service)} 
-                                />
-                            ))}
-                            {services.length === 0 && (
-                                <p className="text-muted fst-italic">No hay servicios seleccionados</p>
-                            )}
-                        </div>
-                    </Form.Group>
-                </div>
+                    
+                    
+              
             </Modal.Body>
             <Modal.Footer className="border-top py-3 bg-light">
                 <Button 
