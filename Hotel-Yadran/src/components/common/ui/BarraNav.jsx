@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
-import { useAuth } from '../../config/context/auth/useAuth';
+import { useAuth } from '../../../config/context/auth/useAuth';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 

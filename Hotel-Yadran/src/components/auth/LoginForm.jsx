@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 
 import logo from '../../assets/img/logo.jpg'
 
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, Bed } from "lucide-react"
 import { FaUser, FaGoogle } from "react-icons/fa"
 
 /* Servicios */
@@ -18,9 +18,30 @@ import { useAuth } from "../../config/context/auth/useAuth"
 
 /* CustomComponetes */
 import BtnLoginGoogle from './components/BtnLoginGoogle';
+import { FormInput } from '../common/forms/FormInput';
+import { AlertComponent } from '../common/alerts/AlertComponent';
 
-
-
+// Custom button component with loading state
+const LoginButton = ({ loading, onClick, text, loadingText }) => {
+  return (
+    <Button 
+      className="w-100 mt-3" 
+      variant="primary" 
+      type="button" 
+      disabled={loading} 
+      onClick={onClick}
+    >
+      {loading ? (
+        <>
+          <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+          <span className="ms-2">{loadingText}</span>
+        </>
+      ) : (
+        text
+      )}
+    </Button>
+  );
+};
 
 function LoginForm() {
 
@@ -43,17 +64,12 @@ function LoginForm() {
     }, []);
 
     /* Alerta */
-    const mostrarAlerta = (icono, titulo, texto) => {
-        return Swal.mixin({
-            icon: icono,
-            title: titulo,
-            text: texto,
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true
-        }).fire(); 
+    const mostrarAlerta = async (icon, title, text) => {
+        return Swal.fire({
+            icon,
+            title,
+            text
+        });
     };
 
     /* Cargar datos */
@@ -63,7 +79,7 @@ function LoginForm() {
             const data = await usersCalls.GetUsers();
             setUsuarios(data);
         } catch (error) {
-            await mostrarAlerta("error", "Error", "Ocurrió un error al cargar los datos");
+            await AlertComponent("error", "Error", "Ocurrió un error al cargar los datos");
         } finally {
             setCargando(false);
         };
@@ -169,51 +185,58 @@ return (
             <Card.Body>
                <Form>
 
-               <Form.Group>
-                    <Form.Label>Correo Electrónico</Form.Label>
-                    <InputGroup>
-                        <Form.Control
-                        value={formData.correo}
-                        onChange={(e) => manejarInput("correo", e.target.value)}
-                        isInvalid={!!errors.correo}
-                        placeholder='Ingrese su correo electrónico'/>
-                        <Form.Control.Feedback type='invalid'>{errors.correo}</Form.Control.Feedback>
-                    </InputGroup>
-                </Form.Group>
+               {/* Replace email input section with: */}
+               <FormInput
+                 label="Correo Electrónico"
+                 name="correo"
+                 value={formData.correo}
+                 onChange={(e) => manejarInput("correo", e.target.value)}
+                 error={errors.correo}
+                 placeholder='Ingrese su correo electrónico'
+                 icon={FaUser}
+               />
+
+               {/* Replace password input section with: */}
+               <FormInput
+                 label="Contraseña"
+                 name="contraseña"
+                 type={showPass ? "text" : "password"}
+                 value={formData.contraseña}
+                 onChange={(e) => manejarInput("contraseña", e.target.value)}
+                 error={errors.contraseña}
+                 placeholder='Ingrese su contraseña'
+                 icon={showPass ? EyeOff : Eye}
+               />
 
                 <Form.Group className='mt-3'>
                     <Form.Label>Contraseña</Form.Label>
                     <InputGroup>
                         <Form.Control
-                        id='contrasena'
-                        disabled={Cargando}
-                        type={showPass ? "text" : "password"}
-                        value={formData.contraseña}
-                        onChange={(e) => manejarInput("contraseña", e.target.value)}
-                        isInvalid={!!errors.contraseña}
-                        placeholder='Ingrese su contraseña'/>
-                       <Button variant='outline-secondary'
-                       onClick={altShowPass}
-                       disabled={Cargando}>
+                            id='contrasena'
+                            disabled={Cargando}
+                            type={showPass ? "text" : "password"}
+                            value={formData.contraseña}
+                            onChange={(e) => manejarInput("contraseña", e.target.value)}
+                            isInvalid={!!errors.contraseña}
+                            placeholder='Ingrese su contraseña'/>
+                        <Button variant='outline-secondary'
+                            onClick={altShowPass}
+                            disabled={Cargando}>
                             {showPass ? <EyeOff /> : <Eye />}
-                       </Button>
-                       <Form.Control.Feedback type='invalid'>{errors.contraseña}</Form.Control.Feedback>
+                        </Button>
+                        <Form.Control.Feedback type='invalid'>{errors.contraseña}</Form.Control.Feedback>
                     </InputGroup>
                 </Form.Group>
 
                 
-                <Button 
-                    variant="primary" 
-                    className="w-100 mt-4" 
-                    onClick={manejarLogin} 
-                    disabled={Cargando}>
-                    {Cargando ? (
-                        <>
-                            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                            <span className="ms-2">Cargando...</span>
-                        </>
-                    ) : "Iniciar Sesión"}
-                </Button>
+
+                
+                <LoginButton 
+                    loading={Cargando}
+                    onClick={manejarLogin}
+                    text="Iniciar Sesión"
+                    loadingText="Cargando..."
+                />
                 <Container className="text-muted small mt-1 mb-1"><FaUser className="me-1" />Autenticación Local</Container>
                 
                 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import AdminNav from '../../components/admin/ui/AdminNav'
+import AdminNav from '../../components/common/ui/AdminNav'
 import BarraNav from '../../components/home/BarraNav'
 import AdminRooms from '../../components/admin/components/AdminRooms'
 import AdminRoomsEsq from '../../components/admin/components/AdminRoomsEsq';
@@ -41,7 +41,6 @@ function Admin() {
             });
         } else {
             console.log('Admin validation succeeded');
-            // Added 3 second delay before hiding skeleton
             setTimeout(() => {
                 setIsLoading(false);
             }, 3000);

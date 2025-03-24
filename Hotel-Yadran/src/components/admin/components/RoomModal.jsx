@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form, Container } from 'react-bootstrap';
+import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap/dist/js/bootstrap.bundle.min.js"
-import BadgeComponent from '../../test/BadgeComponent';
+import BadgeComponent from '../../common/badges/BadgeComponent';
 import "../styles/roomModal.css"
 import { Wifi, AirVent, Tv, Bath, Bed, DollarSign, Users, FileText, CheckSquare, Hash, Image } from 'lucide-react';
 import { GiPalmTree } from 'react-icons/gi';
-import Swal from 'sweetalert2';
+ import Swal from 'sweetalert2';
+import { ServiceCheckChip, StatusBadge } from '../../common/badges';
 
 const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveRoom: externalHandleSaveRoom }) => {
     const services = Array.isArray(roomData.services) ? roomData.services : [];
@@ -95,7 +96,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
             }
         } catch (error) {
             await Swal.fire({
-                icon: 'error',
+                icon: "error",
                 title: 'Error',
                 text: 'Hubo un error al procesar la solicitud',
                 confirmButtonColor: '#3085d6'
@@ -195,7 +196,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                         </div>
 
                         <div className="col-md-6">
-                    <Form.Group controlId="formRoomName">
+                            <Form.Group controlId="formRoomName">
                                 <Form.Label className="fw-semibold mb-2 text-dark">
                                     <Bed className="me-2 text-primary" size={18} />
                                     Nombre <span className="text-danger">*</span>
@@ -212,7 +213,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                     </Form.Group>
                         </div>
                         <div className="col-md-6">
-                    <Form.Group controlId="formRoomType">
+                            <Form.Group controlId="formRoomType">
                                 <Form.Label className="fw-semibold mb-2 text-dark">
                                     <FileText className="me-2 text-primary" size={18} />
                                     Tipo <span className="text-danger">*</span>
@@ -229,7 +230,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                     </Form.Group>
                         </div>
                         <div className="col-md-6">
-                    <Form.Group controlId="formRoomPrice">
+                            <Form.Group controlId="formRoomPrice">
                                 <Form.Label className="fw-semibold mb-2 text-dark">
                                     <DollarSign className="me-2 text-success" size={18} />
                                     Precio <span className="text-danger">*</span>
@@ -246,7 +247,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                     </Form.Group>
                         </div>
                         <div className="col-md-6">
-                    <Form.Group controlId="formRoomCapacity">
+                            <Form.Group controlId="formRoomCapacity">
                                 <Form.Label className="fw-semibold mb-2 text-dark">
                                     <Users className="me-2 text-info" size={18} />
                                     Capacidad <span className="text-danger">*</span>
@@ -263,7 +264,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                     </Form.Group>
                         </div>
                         <div className="col-12">
-                    <Form.Group controlId="formRoomDescription">
+                            <Form.Group controlId="formRoomDescription">
                                 <Form.Label className="fw-semibold mb-2 text-dark">
                                     <FileText className="me-2 text-primary" size={18} />
                                     Descripción <span className="text-danger">*</span>
@@ -283,17 +284,86 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                         </div>
                     </div>
 
-                    <Form.Group controlId="formRoomAvailable" className="mt-4">
-                        <Form.Check
-                            type="checkbox"
-                            label={<span className="fs-5 text-success">
-                                <CheckSquare className="me-2" size={18} />
-                                Disponible
-                            </span>}
-                            name="available"
-                            checked={roomData.available}
-                            onChange={(e) => handleInputChange({ target: { name: 'available', value: e.target.checked } })}
-                        />
+                    <Form.Group controlId="formRoomStatus" className="mt-4">
+                        <Form.Label className="h5 mb-3 text-primary">Estado de la Habitación</Form.Label>
+                        <div className="d-flex flex-wrap gap-3">
+                            <Form.Check
+                                type="checkbox"
+                                label={<span className="d-flex align-items-center"><CheckSquare className="me-2" size={18} />Disponible</span>}
+                                checked={roomData.available}
+                                onChange={(e) => {
+                                    handleInputChange({ target: { name: 'available', value: e.target.checked } });
+                                    handleInputChange({ 
+                                        target: { 
+                                            value: {
+                                                ...roomData,
+                                                available: e.target.checked,
+                                                maintenance: false,
+                                                cleaning: false,
+                                                reserved: false,
+                                                occupied: false
+                                            }
+                                        } 
+                                    });
+                                }}
+                            />
+                            <Form.Check
+                                type="checkbox"
+                                label={<span className="d-flex align-items-center"><CheckSquare className="me-2" size={18} />En Mantenimiento</span>}
+                                checked={roomData.maintenance}
+                                onChange={(e) => {
+                                    handleInputChange({ target: { name: 'maintenance', value: e.target.checked } });
+                                    if(e.target.checked) {
+                                        handleInputChange({ target: { name: 'available', value: false } });
+                                        handleInputChange({ target: { name: 'cleaning', value: false } });
+                                        handleInputChange({ target: { name: 'reserved', value: false } });
+                                        handleInputChange({ target: { name: 'occupied', value: false } });
+                                    }
+                                }}
+                            />
+                            <Form.Check
+                                type="checkbox"
+                                label={<span className="d-flex align-items-center"><CheckSquare className="me-2" size={18} />En Limpieza</span>}
+                                checked={roomData.cleaning}
+                                onChange={(e) => {
+                                    handleInputChange({ target: { name: 'cleaning', value: e.target.checked } });
+                                    if(e.target.checked) {
+                                        handleInputChange({ target: { name: 'available', value: false } });
+                                        handleInputChange({ target: { name: 'maintenance', value: false } });
+                                        handleInputChange({ target: { name: 'reserved', value: false } });
+                                        handleInputChange({ target: { name: 'occupied', value: false } });
+                                    }
+                                }}
+                            />
+                            <Form.Check
+                                type="checkbox"
+                                label={<span className="d-flex align-items-center"><CheckSquare className="me-2" size={18} />Reservada</span>}
+                                checked={roomData.reserved}
+                                onChange={(e) => {
+                                    handleInputChange({ target: { name: 'reserved', value: e.target.checked } });
+                                    if(e.target.checked) {
+                                        handleInputChange({ target: { name: 'available', value: false } });
+                                        handleInputChange({ target: { name: 'maintenance', value: false } });
+                                        handleInputChange({ target: { name: 'cleaning', value: false } });
+                                        handleInputChange({ target: { name: 'occupied', value: false } });
+                                    }
+                                }}
+                            />
+                            <Form.Check
+                                type="checkbox"
+                                label={<span className="d-flex align-items-center"><CheckSquare className="me-2" size={18} />Ocupada</span>}
+                                checked={roomData.occupied}
+                                onChange={(e) => {
+                                    handleInputChange({ target: { name: 'occupied', value: e.target.checked } });
+                                    if(e.target.checked) {
+                                        handleInputChange({ target: { name: 'available', value: false } });
+                                        handleInputChange({ target: { name: 'maintenance', value: false } });
+                                        handleInputChange({ target: { name: 'cleaning', value: false } });
+                                        handleInputChange({ target: { name: 'reserved', value: false } });
+                                    }
+                                }}
+                            />
+                        </div>
                     </Form.Group>
                 </Form>
                 
@@ -303,17 +373,20 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                             
                             <Form.Label className="h5 mb-3 text-primary">Servicios Disponibles</Form.Label>
 
-                            {servicesList.map(service => (
-                                    <div className="col-md-6" key={service.value}>
-                                        <BadgeComponent
-                                            text={service.label}
-                                            variant={services.includes(service.value) ? 'info' : 'secondary'}
-                                            icon={service.icon}
-                                            onClick={() => handleServiceChange(service.value)}
-                                            className="cursor-pointer"
-                                        />
-                                    </div>
-                                ))}
+                            <Row className="g-3">
+                              {servicesList.map(service => (
+                                <Col md={6} key={service.value}>
+                                    <ServiceCheckChip
+                                      service={service.value}
+                                      label={service.label}
+                                      icon={service.icon}
+                                      isSelected={services.includes(service.value)}
+                                      onClick={() => handleServiceChange(service.value)}
+                                      className="me-2 mb-2"
+                                    />
+                                </Col>
+                              ))}
+                            </Row>
 
                         </Form.Group>
                     </Container>
@@ -329,7 +402,8 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                     variant="outline-secondary" 
                     onClick={handleClose} 
                     size="lg"
-                    className="px-4"
+                    className="px-4 me-3"
+                    style={{ minWidth: '120px' }}
                 >
                     Cancelar
                 </Button>
@@ -338,6 +412,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                     onClick={handleSaveRoom} 
                     size="lg"
                     className="px-4"
+                    style={{ minWidth: '120px' }}
                 >
                     {roomData.id ? 'Actualizar' : 'Añadir'}
                 </Button>

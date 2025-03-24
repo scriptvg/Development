@@ -6,13 +6,11 @@ import logo from '../../assets/img/logo.jpg';
 import "./styles/nav.css";
 import { User, Settings, Users, Hotel, MessageSquare, Home, Menu, X } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
-import { SideBar } from './ui/SideBar.jsx';
 
 function BarraNav() {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const [showAdminSidebar, setShowAdminSidebar] = useState(false);
-    const [showCrudSidebar, setShowCrudSidebar] = useState(false);
 
     const cerrarSesion = async () => {
         try {
@@ -60,18 +58,20 @@ function BarraNav() {
                         <Nav className="auth-section">
                             {!user ? (
                                 <div className="d-flex gap-3">
-                                    <Button className="auth-btn register-btn" variant="outline-primary" onClick={() => navigate('/register')}>
+                                    <Button className="auth-btn register-btn" variant="outline-primary" onClick={() => navigate('/register')} 
+                                        style={{ padding: '0.5rem 1.25rem', transition: 'all 0.2s' }}>
                                         Registrarse
                                     </Button>
-                                    <Button className="auth-btn login-btn" variant="primary" onClick={() => navigate('/login')}>
+                                    <Button className="auth-btn login-btn" variant="primary" onClick={() => navigate('/login')} 
+                                        style={{ padding: '0.5rem 1.25rem', transition: 'all 0.2s' }}>
                                         Iniciar Sesión
                                     </Button>
                                 </div>
                             ) : (
                                 <div className="d-flex align-items-center gap-3">
                                     <div className="welcome-container">
-                                        <span className="welcome-name">¡Hola, {user.nombre} {user.rol}!</span>
-                                        <div className="user-type">
+                                        <span className="welcome-name" style={{ fontSize: '1.1rem', fontWeight: 600 }}>¡Hola, {user.nombre}!</span>
+                                        <div className="user-type" style={{ fontSize: '0.9rem' }}>
                                             {user.authProvider === 'google' ? (
                                                 <FaGoogle className="provider-icon google" />
                                             ) : (
@@ -88,17 +88,11 @@ function BarraNav() {
                                             className="admin-menu-btn"
                                             variant="outline-primary"
                                             onClick={() => setShowAdminSidebar(true)}
+                                            style={{ padding: '0.5rem 1rem', transition: 'all 0.2s' }}
                                         >
                                             <Menu size={20} />
                                         </Button>
                                     )}
-                                    <Button
-                                      className="crud-menu-btn ms-2"
-                                      variant="outline-primary"
-                                      onClick={() => setShowCrudSidebar(true)}
-                                    >
-                                      <Menu size={20} />
-                                    </Button>
                                     <Button 
                                         className="logout-btn" 
                                         variant="outline-danger" 
@@ -130,6 +124,7 @@ function BarraNav() {
                             variant="link" 
                             className="close-btn"
                             onClick={() => setShowAdminSidebar(false)}
+                            style={{ padding: '0.25rem', marginLeft: 'auto' }}
                         >
                             <X size={24} />
                         </Button>
@@ -141,7 +136,7 @@ function BarraNav() {
                                     key={index}
                                     onClick={() => {
                                         navigate(item.path);
-                                        setShowSidebar(false);
+                                        setShowAdminSidebar(false);
                                     }}
                                     className="admin-menu-item"
                                 >
@@ -153,10 +148,6 @@ function BarraNav() {
                     </Offcanvas.Body>
                 </Offcanvas>
             )}
-            <SideBar 
-              show={showCrudSidebar} 
-              handleClose={() => setShowCrudSidebar(false)}
-            />
         </>
     );
 }

@@ -1,30 +1,26 @@
-import React from 'react';
-import { Modal, Button, Badge } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Modal, Button, Badge, Container, Row, Col } from 'react-bootstrap';
 import { Wifi, AirVent, Tv, Bath, Bed, DollarSign, Users, FileText, CheckSquare, Hash, Image } from 'lucide-react';
 import { GiPalmTree } from 'react-icons/gi';
-import BadgeComponent from '../../test/BadgeComponent';
 import "../styles/roomModal.css";
+import { servicesList, statusList } from '../../../config/constants/constants.jsx';
+import { ServiceCheckChip, StatusBadge, ServiceIcon } from '../../common/badges';
+import ModalHeader from '../../common/modals/ModalHeader';
+import { ModalBodySections } from '../../common/modals/ModalBodySections';
 
 function RoomModalVer({ show, handleClose, roomData }) {
+    // Initialize services array safely from roomData
     const services = Array.isArray(roomData?.services) ? roomData.services : [];
+    const [selectedServices, setSelectedServices] = useState(services);
 
-    const servicesList = [
-        { value: 'wifi', label: 'Wi-Fi', icon: <Wifi size={18} /> },
-        { value: 'aire_acondicionado', label: 'Aire Acondicionado', icon: <AirVent size={18} /> },
-        { value: 'tv', label: 'Smart TV', icon: <Tv size={18} /> },
-        { value: 'vista_al_mar', label: 'Vista al Mar', icon: <GiPalmTree size={18} /> },
-        { value: 'bano_privado', label: 'Baño Privado', icon: <Bath size={18} /> }
-    ];
-
-    const getServiceIcon = (service) => {
-        switch (service) {
-            case 'wifi': return <Wifi size={22} />;
-            case 'aire_acondicionado': return <AirVent size={22} />;
-            case 'tv': return <Tv size={22} />;
-            case 'vista_al_mar': return <GiPalmTree size={22} />;
-            case 'bano_privado': return <Bath size={22} />;
-            default: return null;
-        }
+    // Function to determine room status from room data
+    const getStatusFromRoomData = () => {
+        if (!roomData) return 'N/A';
+        if (roomData.available) return 'disponible';
+        if (roomData.maintenance) return 'mantenimiento';
+        if (roomData.cleaning) return 'limpieza';
+        if (roomData.reserved) return 'reservada';
+        return 'ocupada';
     };
 
     return (
@@ -32,25 +28,21 @@ function RoomModalVer({ show, handleClose, roomData }) {
             show={show} 
             onHide={handleClose} 
             centered
-            className="room-modal"
+            className="room-modal skeleton-loading"
             dialogClassName="modal-dialog-centered modal-dialog-scrollable"
             size="lg"
+            backdrop="static"
+            keyboard={false}
         >
-            <Modal.Header closeButton className="border-bottom bg-light">
-                <Modal.Title className="d-flex align-items-center justify-content-between w-100">
-                    <div className="d-flex align-items-center">
-                        <Bed className="me-3 text-primary" size={28} />
-                        <span className="h4 mb-0">Detalles de la Habitación</span>
-                    </div>
-                    <div className="badge bg-secondary d-flex align-items-center">
-                        <Hash size={14} className="me-1" />
-                        <span className="fs-6">{roomData?.id || ''}</span>
-                    </div>
-                </Modal.Title>
-            </Modal.Header>
+            <ModalHeader 
+                title="Detalles de la Habitación"
+                icon={Bed}
+                roomId={roomData?.id}
+                onClose={handleClose}
+            />
 
             <Modal.Body className="py-4 bg-white">
-                <div className="form-section form-section-left">
+                <div className="form-section form-section-left mb-4">
                     <div className="row g-4">
                         <div className="col-12 mb-4">
                             <div className="d-flex align-items-center gap-3">
@@ -99,7 +91,7 @@ function RoomModalVer({ show, handleClose, roomData }) {
                             <div className="mb-3">
                                 <label className="fw-semibold mb-2 text-dark d-flex align-items-center">
                                     <DollarSign className="me-2 text-success" size={18} />
-                                    Precio
+                                    Precio 1 noche(s)
                                 </label>
                                 <div className="form-control-lg bg-light rounded p-2">
                                     ${roomData?.price || '0'}
@@ -134,41 +126,25 @@ function RoomModalVer({ show, handleClose, roomData }) {
 
                     <div className="mt-4">
                         <label className="fw-semibold mb-2 text-dark">Estado</label>
-                        <Badge 
-                            bg={roomData?.available ? 'success' : 'danger'}
-                            className="px-3 py-2 rounded-pill fw-semibold d-inline-block"
-                        >
-                            {roomData?.available ? 'Disponible' : 'No Disponible'}
-                        </Badge>
-                    </div>
-                </div>
-
-                <div className="form-section services-section mt-4 pt-4 border-top">
-                    <div className="mb-4">
-                        <h5 className="text-primary mb-3">Servicios Seleccionados</h5>
-                        <div className="d-flex flex-wrap gap-2">
-                            {services.map(service => (
-                                <BadgeComponent 
-                                    key={service} 
-                                    text={service} 
-                                    variant="info" 
-                                    icon={getServiceIcon(service)} 
-                                />
-                            ))}
-                            {services.length === 0 && (
-                                <p className="text-muted fst-italic">No hay servicios seleccionados</p>
-                            )}
-                        </div>
+                        <StatusBadge status={getStatusFromRoomData()} />
                     </div>
                 </div>
             </Modal.Body>
 
+            <ModalBodySections 
+                roomData={roomData}
+                selectedServices={selectedServices}
+                servicesList={servicesList}
+                statusList={statusList}
+            />
+
             <Modal.Footer className="border-top py-3 bg-light">
                 <Button 
-                    variant="outline-secondary" 
-                    onClick={handleClose} 
+                    variant="outline-primary"
+                    onClick={handleClose}
                     size="lg"
-                    className="px-4"
+                    className="px-4 rounded-3"
+                    style={{ minWidth: '120px' }}
                 >
                     Cerrar
                 </Button>

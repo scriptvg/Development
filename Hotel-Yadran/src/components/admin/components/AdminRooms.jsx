@@ -5,7 +5,8 @@ import roomsCalls from '../../../config/services/roomsCalls';
 import RoomModal from './RoomModal';
 import RoomModalVer from './RoomModalVer';
 import "../styles/adminRooms.css"
-import { CirclePlus, FilePlus } from 'lucide-react';
+import { CirclePlus, FilePlus, FilePenLine, FileSearch, FileX, Filter, Eraser } from 'lucide-react';
+import { statusList } from '../../../config/constants/constants.jsx';
 
 function AdminRooms() {
     const [rooms, setRooms] = useState([]);
@@ -63,7 +64,7 @@ function AdminRooms() {
             if (!roomData.id) {
                 const newRoomData = {
                     ...roomData,
-                    id: `HAB-${Date.now().toString(34).toUpperCase()}`
+                    id: `HAB-${Date.now().toString(36).toUpperCase()}`
                 };
                 const newRoom = await roomsCalls.AddRoom(newRoomData);
                 setRooms(prev => [...prev, newRoom]);
@@ -107,7 +108,7 @@ function AdminRooms() {
         }
 
         if (activeTab !== 'Todos') {
-            filtered = filtered.filter(room => room.available === (activeTab === 'Disponible'));
+            filtered = filtered.filter(room => activeTab === 'Todos' ? true : getCurrentStatus(room) === activeTab);
         }
 
         setFilteredRooms(filtered);
@@ -118,7 +119,7 @@ function AdminRooms() {
         setSelectedState('');
     };
 
-    const uniqueStates = ['Todos', 'Disponible', 'No Disponible', 'En Mantenimiento', 'Ocupada' ];
+    const uniqueStates = ['Todos', 'Disponible', 'En Mantenimiento', 'En Limpieza', 'Reservada', 'Ocupada'];
 
     return (
         <Container className="containerRooms py-5">
@@ -139,7 +140,7 @@ function AdminRooms() {
                                 onClick={handleShow}
                                 className="d-flex align-items-center rounded-3 px-4"
                                 size="lg">
-                                <FilePlus className='bi bi-plus-circle-fill me-2' />
+                                <FilePlus width={20} className='me-2' />
                                 Añadir Habitación
                             </Button>
                         </Col>
@@ -147,7 +148,7 @@ function AdminRooms() {
 
 
 
-                    <Row className="mb-3 mt-3">
+                    <Row className="mb-5 mt-3">
 
                         <Col>
 
@@ -180,8 +181,8 @@ function AdminRooms() {
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
-                                <Button variant="secondary" onClick={filterRooms}>Filtrar</Button>
-                                <Button variant="danger" onClick={clearFilter}>X LIMPIAR</Button>
+                                <Button variant="secondary" onClick={filterRooms}><Filter/></Button>
+                                <Button variant="danger" onClick={clearFilter}><Eraser/></Button>
                             </InputGroup>
                         </Col>
 
@@ -191,17 +192,17 @@ function AdminRooms() {
 
                     
 
-                    <Table striped bordered hover responsive className="align-middle table-hover">
+                    <Table striped bordered hover responsive className="shadow align-middle table-hover">
                         <thead>
                             <tr className="bg-light">
-                                <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">ID</th>
-                                <th className="py-3 text-uppercase fs-6 fw-bold text-secondary">Nombre</th>
-                                <th className="py-3 text-uppercase fs-6 fw-bold text-secondary">Tipo</th>
-                                <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">Precio</th>
-                                <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">Capacidad</th>
-                                <th className="py-3 text-uppercase fs-6 fw-bold text-secondary">Descripción</th>
-                                <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">Estado</th>
-                                <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">Acciones</th>
+                                <th className="text-center py-3 fs-5 fw-bold text-dark">ID</th>
+                                <th className="py-3 fs-5 fw-bold text-dark">Nombre</th>
+                                <th className="py-3 fs-5 fw-bold text-dark">Tipo</th>
+                                <th className="text-center py-3 fs-5 fw-bold text-dark">Precio</th>
+                                <th className="text-center py-3 fs-5 fw-bold text-dark">Capacidad</th>
+                                <th className="py-3 fs-5 fw-bold text-dark">Descripción</th>
+                                <th className="text-center py-3 fs-5 fw-bold text-dark">Estado</th>
+                                <th className="text-center py-3 fs-5 fw-bold text-dark">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -215,35 +216,27 @@ function AdminRooms() {
                                         <td className="text-center">{room.capacity} personas</td>
                                         <td className="text-truncate" style={{ maxWidth: '250px' }}>{room.description}</td>
                                         <td className="text-center">
-                                            <Badge
-                                                bg={room.available ? 'success' : 'danger'}
-                                                className="px-3 py-2 rounded-pill fw-semibold"
-                                            >
-                                                {room.available ? 'Disponible' : 'No Disponible'}
-                                            </Badge>
+                                            <RoomStatusIndicator room={room} />
                                         </td>
-                                        <td className="text-center">
-                                            <Button
-                                                variant="outline-warning"
-                                                className="me-2 mb-1 mb-md-0 rounded-3"
+                                        <td className="text-center row-1 col-3">
+                                            <ActionButton
+                                                variant="warning"
+                                                icon={FilePenLine}
                                                 onClick={() => { setRoomData(room); handleShow(); }}
-                                            >
-                                                <i className="bi bi-pencil-square me-1"></i> Editar
-                                            </Button>
-                                            <Button
-                                                variant="outline-info"
-                                                className="me-2 mb-1 mb-md-0 rounded-3"
+                                                className="mb-md-0 col-1"
+                                            />
+                                            <ActionButton
+                                                variant="info"
+                                                icon={FileSearch}
                                                 onClick={() => { setRoomData(room); handleShowView(); }}
-                                            >
-                                                <i className="bi bi-eye me-1"></i> Ver
-                                            </Button>
-                                            <Button
-                                                variant="outline-danger"
-                                                className="rounded-3"
+                                                className="mb-1 mb-md-0 col-2"
+                                            />
+                                            <ActionButton
+                                                variant="danger"
+                                                icon={FileX}
                                                 onClick={() => handleDeleteRoom(room.id)}
-                                            >
-                                                <i className="bi bi-trash-fill me-1"></i> Eliminar
-                                            </Button>
+                                                className="col-3"
+                                            />
                                         </td>
                                     </tr>
                                 ))
@@ -255,9 +248,8 @@ function AdminRooms() {
                                         <Button
                                             variant="primary"
                                             className="rounded-3 px-4"
-                                            onClick={handleShow}
-                                        >
-                                            <i className="bi bi-plus-circle me-2"></i>
+                                            onClick={handleShow}>
+                                            <CirclePlus className='icono-acciones' />
                                             Añadir una habitación
                                         </Button>
                                     </td>

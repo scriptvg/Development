@@ -10,6 +10,7 @@ import RutaProtegida from '../../components/security/RutaProtegida';
 /* Rutas de la aplicación */
 import Home from '../../pages/public/home/Home';
 import Admin from '../../pages/admin/Admin';
+import AdminRooms from '../../components/admin/components/AdminRooms';
 import Login from '../../pages/auth/Login';
 
 
@@ -30,18 +31,17 @@ function Routing() {
 
                 {/* Rutas protegidas */}
                 <Route 
-                    path='/dashboard/*' 
+                    path='/dashboard/*'
                     element={
                         <RutaProtegida roles={['admin']}>
                             <Admin/>
-                        </RutaProtegida>}/>
+                        </RutaProtegida>
+                    }
+                >
+                    <Route path='habitaciones' element={<AdminRooms />} />
+                </Route>
 
-                <Route 
-                    path='/habitaciones/*' 
-                    element={
-                        <RutaProtegida roles={['admin']}>
-                            <Admin/>
-                        </RutaProtegida>}/>
+
             </Routes>
         </Router>
         </AuthProvider> 

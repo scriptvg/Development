@@ -26,46 +26,14 @@ function AdminRoomsEsq() {
           <Table striped bordered hover responsive className="align-middle">
             <thead>
               <tr className="bg-light">
-                <th className="text-center py-3">
-                  <div className="placeholder-glow">
-                    <span className="placeholder col-6"></span>
-                  </div>
-                </th>
-                <th className="py-3">
-                  <div className="placeholder-glow">
-                    <span className="placeholder col-6"></span>
-                  </div>
-                </th>
-                <th className="py-3">
-                  <div className="placeholder-glow">
-                    <span className="placeholder col-4"></span>
-                  </div>
-                </th>
-                <th className="text-center py-3">
-                  <div className="placeholder-glow">
-                    <span className="placeholder col-6"></span>
-                  </div>
-                </th>
-                <th className="text-center py-3">
-                  <div className="placeholder-glow">
-                    <span className="placeholder col-8"></span>
-                  </div>
-                </th>
-                <th className="py-3">
-                  <div className="placeholder-glow">
-                    <span className="placeholder col-7"></span>
-                  </div>
-                </th>
-                <th className="text-center py-3">
-                  <div className="placeholder-glow">
-                    <span className="placeholder col-6"></span>
-                  </div>
-                </th>
-                <th className="text-center py-3">
-                  <div className="placeholder-glow">
-                    <span className="placeholder col-4"></span>
-                  </div>
-                </th>
+                <th className="text-center py-3 fs-5 fw-bold text-dark">ID</th>
+                <th className="py-3 fs-5 fw-bold text-dark">Nombre</th>
+                <th className="py-3 fs-5 fw-bold text-dark">Tipo</th>
+                <th className="text-center py-3 fs-5 fw-bold text-dark">Precio</th>
+                <th className="text-center py-3 fs-5 fw-bold text-dark">Capacidad</th>
+                <th className="py-3 fs-5 fw-bold text-dark">Descripción</th>
+                <th className="text-center py-3 fs-5 fw-bold text-dark">Estado</th>
+                <th className="text-center py-3 fs-5 fw-bold text-dark">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -102,12 +70,14 @@ function AdminRoomsEsq() {
                     </div>
                   </td>
                   <td className="text-center">
-                    <Badge className="placeholder col-8"></Badge>
+                    <Badge className="placeholder col-8 bg-secondary" style={{height: "32px"}}></Badge>
                   </td>
                   <td className="text-center">
                     <div className="d-flex gap-2 justify-content-center">
-                      <Button variant="outline-warning" className="placeholder col-5" disabled></Button>
-                      <Button variant="outline-danger" className="placeholder col-5" disabled></Button>
+                      <Button variant="outline-warning" className="placeholder col-5 p-2" disabled 
+                        style={{minWidth: "45px", height: "38px"}}></Button>
+                      <Button variant="outline-danger" className="placeholder col-5 p-2" disabled
+                        style={{minWidth: "45px", height: "38px"}}></Button>
                     </div>
                   </td>
                 </tr>
