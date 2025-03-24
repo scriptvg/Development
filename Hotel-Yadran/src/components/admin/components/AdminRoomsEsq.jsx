@@ -3,6 +3,7 @@ import { Table, Button, Container, Card, Row, Col, Badge } from 'react-bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/AdminRoomsEsq.css';
 
+
 function AdminRoomsEsq() {
   return (
     <Container className="containerEsqRooms py-5">

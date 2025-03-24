@@ -7,12 +7,53 @@ import "../styles/roomModal.css"
 import { Wifi, AirVent, Tv, Bath, Bed, DollarSign, Users, FileText, CheckSquare, Hash, Image } from 'lucide-react';
 import { GiPalmTree } from 'react-icons/gi';
 import Swal from 'sweetalert2';
+import EstadoSelectModal from './EstadoSelectModal';
 
+/* Constantes de configuración */
+const TAMAÑOS = {
+    ICONO_PEQUEÑO: 14,
+    ICONO_NORMAL: 18,
+    ICONO_GRANDE: 22,
+    ICONO_EXTRA: 28
+};
+
+const DIMENSIONES = {
+    PREVIEW: {
+        ANCHO: '100px',
+        ALTO: '100px'
+    },
+    MODAL: 'lg'
+};
+
+const SERVICIOS = {
+    WIFI: 'wifi',
+    AIRE: 'aire_acondicionado',
+    TV: 'tv',
+    VISTA_MAR: 'vista_al_mar',
+    BAÑO: 'bano_privado'
+};
+
+const LISTA_SERVICIOS = [
+    { valor: SERVICIOS.WIFI, etiqueta: 'Wi-Fi', icono: <Wifi size={TAMAÑOS.ICONO_NORMAL} /> },
+    { valor: SERVICIOS.AIRE, etiqueta: 'Aire Acondicionado', icono: <AirVent size={TAMAÑOS.ICONO_NORMAL} /> },
+    { valor: SERVICIOS.TV, etiqueta: 'Smart TV', icono: <Tv size={TAMAÑOS.ICONO_NORMAL} /> },
+    { valor: SERVICIOS.VISTA_MAR, etiqueta: 'Vista al Mar', icono: <GiPalmTree size={TAMAÑOS.ICONO_NORMAL} /> },
+    { valor: SERVICIOS.BAÑO, etiqueta: 'Baño Privado', icono: <Bath size={TAMAÑOS.ICONO_NORMAL} /> }
+];
+
+const ESTADOS = {
+    DISPONIBLE: 'disponible',
+    NO_DISPONIBLE: 'no_disponible',
+    MANTENIMIENTO: 'mantenimiento'
+};
+
+/* Componente modal de habitaciones */
 const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveRoom: externalHandleSaveRoom }) => {
-    const services = Array.isArray(roomData.services) ? roomData.services : [];
-    const [imagePreview, setImagePreview] = useState(roomData.image || null);
+    const [previewImagen, setPreviewImagen] = useState(roomData.image || null);
+    const servicios = Array.isArray(roomData.services) ? roomData.services : [];
 
-    const validateForm = () => {
+    /* Función de validación del formulario */
+    const validarFormulario = () => {
         if (!roomData.name?.trim()) {
             return { isValid: false, message: 'El nombre de la habitación es requerido' };
         }
@@ -31,15 +72,19 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
         if (!roomData.image) {
             return { isValid: false, message: 'La imagen es requerida' };
         }
+        if (!roomData.estado) {
+            return { isValid: false, message: 'El estado de la habitación es requerido' };
+        }
         return { isValid: true };
     };
 
-    const handleImageChange = (e) => {
+    /* Manejador de cambio de imagen */
+    const manejarCambioImagen = (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImagePreview(reader.result);
+                setPreviewImagen(reader.result);
                 handleInputChange({ 
                     target: { 
                         name: 'image', 
@@ -52,7 +97,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
     };
 
     const handleSaveRoom = async () => {
-        const validation = validateForm();
+        const validation = validarFormulario();
         
         if (!validation.isValid) {
             await Swal.fire({
@@ -103,36 +148,23 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
         }
     };
 
-    const servicesList = [
-        { value: 'wifi', label: 'Wi-Fi', icon: <Wifi size={18} /> },
-        { value: 'aire_acondicionado', label: 'Aire Acondicionado', icon: <AirVent size={18} /> },
-        { value: 'tv', label: 'Smart TV', icon: <Tv size={18} /> },
-        { value: 'vista_al_mar', label: 'Vista al Mar', icon: <GiPalmTree size={18} /> },
-        { value: 'bano_privado', label: 'Baño Privado', icon: <Bath size={18} /> }
-    ];
-
     const handleServiceChange = (serviceValue) => {
-        const updatedServices = services.includes(serviceValue)
-            ? services.filter(service => service !== serviceValue)
-            : [...services, serviceValue];
+        const updatedServices = servicios.includes(serviceValue)
+            ? servicios.filter(service => service !== serviceValue)
+            : [...servicios, serviceValue];
         
         handleInputChange({ target: { name: 'services', value: updatedServices } });
     };
 
-    const getServiceIcon = (service) => {
-        switch (service) {
-            case 'wifi':
-                return <Wifi size={22} />;
-            case 'aire_acondicionado':
-                return <AirVent size={22} />;
-            case 'tv':
-                return <Tv size={22} />;
-            case 'vista_al_mar':
-                return <GiPalmTree size={22} />;
-            case 'bano_privado':
-                return <Bath size={22} />;
-            default:
-                return null;
+    const obtenerIconoServicio = (servicio) => {
+        const iconSize = TAMAÑOS.ICONO_GRANDE;
+        switch (servicio) {
+            case SERVICIOS.WIFI: return <Wifi size={iconSize} />;
+            case SERVICIOS.AIRE: return <AirVent size={iconSize} />;
+            case SERVICIOS.TV: return <Tv size={iconSize} />;
+            case SERVICIOS.VISTA_MAR: return <GiPalmTree size={iconSize} />;
+            case SERVICIOS.BAÑO: return <Bath size={iconSize} />;
+            default: return null;
         }
     };
 
@@ -143,7 +175,7 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
             centered 
             className="room-modal"
             dialogClassName="modal-dialog-centered modal-dialog-scrollable"
-            size="lg"
+            size={DIMENSIONES.MODAL}
         >
             <Modal.Header closeButton className="border-bottom bg-light">
                 <Modal.Title className="d-flex align-items-center justify-content-between w-100">
@@ -173,13 +205,13 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                                     <Form.Control
                                         type="file"
                                         accept="image/*"
-                                        onChange={handleImageChange}
+                                        onChange={manejarCambioImagen}
                                         className="form-control-lg shadow-sm"
                                     />
-                                    {imagePreview && (
+                                    {previewImagen && (
                                         <div className="image-preview" style={{width: '100px', height: '100px'}}>
                                             <img 
-                                                src={imagePreview} 
+                                                src={previewImagen} 
                                                 alt="Preview" 
                                                 style={{
                                                     width: '100%', 
@@ -263,62 +295,63 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                     </Form.Group>
                         </div>
                         <div className="col-12">
-                    <Form.Group controlId="formRoomDescription">
+                            <Form.Group controlId="formRoomDescription">
                                 <Form.Label className="fw-semibold mb-2 text-dark">
-                                    <FileText className="me-2 text-primary" size={18} />
+                                    <FileText className="me-2 text-primary" size={TAMAÑOS.ICONO_NORMAL} />
                                     Descripción <span className="text-danger">*</span>
                                 </Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            name="description"
-                            value={roomData.description}
-                            onChange={handleInputChange}
+                                <Form.Control
+                                    as="textarea"
+                                    name="description"
+                                    value={roomData.description}
+                                    onChange={handleInputChange}
                                     placeholder="Descripción detallada de la habitación..."
-                            required
+                                    required
                                     className="form-control-lg shadow-sm"
                                     rows={4}
                                     style={{resize: 'none'}}
-                        />
-                    </Form.Group>
+                                />
+                            </Form.Group>
                         </div>
                     </div>
 
-                    <Form.Group controlId="formRoomAvailable" className="mt-4">
-                        <Form.Check
-                            type="checkbox"
-                            label={<span className="fs-5 text-success">
-                                <CheckSquare className="me-2" size={18} />
-                                Disponible
-                            </span>}
-                            name="available"
-                            checked={roomData.available}
-                            onChange={(e) => handleInputChange({ target: { name: 'available', value: e.target.checked } })}
-                        />
-                    </Form.Group>
                 </Form>
                 
                 <Container className="form-section services-section mt-4 pt-4 border-top">
-                    <Container className='mb-3 shadow'>
+                    <Container className='mb-3'>
                             <Form.Group controlId="formRoomServices">
                             
                             <Form.Label className="h5 mb-3 text-primary">Servicios Disponibles</Form.Label>
 
-                            {servicesList.map(service => (
-                                    <div className="col-md-6" key={service.value}>
-                                        <BadgeComponent
-                                            text={service.label}
-                                            variant={services.includes(service.value) ? 'info' : 'secondary'}
-                                            icon={service.icon}
-                                            onClick={() => handleServiceChange(service.value)}
-                                            className="cursor-pointer"
-                                        />
-                                    </div>
+                            <Container className="d-flex flex-wrap gap-2">
+                                {LISTA_SERVICIOS.map(servicio => (
+                                    <BadgeComponent
+                                        key={servicio.valor}
+                                        text={servicio.etiqueta}
+                                        variant={servicios.includes(servicio.valor) ? 'info' : 'secondary'}
+                                        icon={servicio.icono}
+                                        onClick={() => handleServiceChange(servicio.valor)}
+                                        className="cursor-pointer"
+                                    />
                                 ))}
+                            </Container>
+
+                            {/* Selector de Estado */}
+                    <Container className='mb-3'>
+                        <EstadoSelectModal 
+                            estadoSeleccionado={roomData.estado || ESTADOS.DISPONIBLE}
+                            onChange={(estado) => handleInputChange({
+                                target: { name: 'estado', value: estado }
+                            })}
+                        />
+                    </Container>
 
                         </Form.Group>
                     </Container>
                 
                     </Container>
+                    
+                    
                     
                     
                     

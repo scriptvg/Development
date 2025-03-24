@@ -1,12 +1,111 @@
-# React + Vite
+# Hotel Yadran - Sistema de Gestión Hotelera
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📋 Descripción
+Sistema web para la gestión del Hotel Yadran, desarrollado con React y Bootstrap. Permite la administración de habitaciones, reservas y servicios del hotel.
 
-Currently, two official plugins are available:
+## 🚀 Características Principales
+- Panel de administración protegido
+- Gestión de habitaciones (CRUD)
+- Sistema de autenticación
+- Interfaz responsive
+- Gestión de servicios por habitación
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tecnologías Utilizadas
+- React.js
+- React Bootstrap
+- React Router DOM
+- SweetAlert2
+- Lucide React
+- React Icons
 
-## Expanding the ESLint configuration
+## 📁 Estructura del Proyecto
+```
+Hotel-Yadran/
+├── src/
+│   ├── assets/          # Recursos estáticos
+│   ├── components/      # Componentes reutilizables
+│   │   ├── admin/      # Componentes del panel admin
+│   │   ├── home/       # Componentes de la página principal
+│   │   └── security/   # Componentes de seguridad
+│   ├── config/         # Configuraciones
+│   │   ├── context/    # Contextos de React
+│   │   └── routes/     # Configuración de rutas
+│   └── pages/          # Páginas principales
+```
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🔐 Convenciones de Código
+
+### Nomenclatura
+- Constantes: MAYUSCULAS_GUION (ej: BTN_GUARDAR)
+- Variables: camelCase (ej: nombreUsuario)
+- Componentes: PascalCase (ej: RoomModal)
+- Archivos: PascalCase.jsx
+
+### Ejemplos de Nomenclatura
+```javascript
+// Constantes
+const BTN_GUARDAR = 'Guardar';
+const RUTA_API = 'http://api.ejemplo.com';
+
+// Variables
+const nombreUsuario = 'Juan';
+const listaHabitaciones = [];
+```
+
+## 🚦 Guía de Instalación
+1. Clonar el repositorio
+```bash
+git clone [URL_REPOSITORIO]
+```
+2. Instalar dependencias
+```bash
+npm install
+```
+3. Ejecutar en desarrollo
+```bash
+npm run dev
+```
+
+## 📝 Configuración
+El proyecto utiliza las siguientes configuraciones principales:
+
+### ESLint
+- Configurado para React
+- Reglas personalizadas para control de código
+- Integración con React Hooks
+
+### Enrutamiento
+- Sistema de rutas protegidas
+- Gestión de roles (admin)
+- Redirecciones automáticas
+
+## 🔒 Seguridad
+- Autenticación mediante contexto (useAuth)
+- Rutas protegidas por roles
+- Validación de formularios
+
+## 🎨 Estilos
+- Bootstrap para componentes base
+- CSS personalizado para componentes específicos
+- Sistema de diseño responsive
+
+## 🛠️ Mantenimiento
+Para mantener el código:
+1. Seguir convenciones de nombrado
+2. Documentar cambios importantes
+3. Mantener la estructura de carpetas
+4. Realizar pruebas antes de commits
+
+## 👥 Roles y Permisos
+- Admin: Acceso total al sistema
+- Usuario: Acceso a áreas públicas
+- Visitante: Solo visualización
+
+## 🔄 Flujo de Trabajo
+1. Desarrollo en ramas feature/
+2. Pull requests para revisión
+3. Merge a main tras aprobación
+4. Deploy automático
+
+## 📫 Contacto
+[Información de contacto del equipo/desarrollador]

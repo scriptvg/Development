@@ -6,119 +6,144 @@ import RoomModal from './RoomModal';
 import RoomModalVer from './RoomModalVer';
 import "../styles/adminRooms.css"
 import { CirclePlus, FilePlus } from 'lucide-react';
+import EstadoBadge from './EstadoBadge';
+import { ESTADOS, LISTA_ESTADOS } from '../utils/estadosConfig';
+import roomDataService from '../../../config/services/roomDataService';
 
 function AdminRooms() {
-    const [rooms, setRooms] = useState([]);
-    const [filteredRooms, setFilteredRooms] = useState([]);
-    const [showModal, setShowModal] = useState(false);
-    const [showViewModal, setShowViewModal] = useState(false);
-    const [roomData, setRoomData] = useState({
+    // Estados para manejar datos y modales
+    const [habitaciones, setHabitaciones] = useState([]);
+    const [habitacionesFiltradas, setHabitacionesFiltradas] = useState([]);
+    const [mostrarModal, setMostrarModal] = useState(false);
+    const [mostrarModalVer, setMostrarModalVer] = useState(false);
+    const [datosHabitacion, setDatosHabitacion] = useState({
         id: '',
-        name: '',
-        type: '',
-        price: '',
-        description: '',
-        capacity: '',
-        available: false,
-        services: []
+        nombre: '',
+        tipo: '',
+        precio: '',
+        descripcion: '',
+        capacidad: '',
+        disponible: false,
+        servicios: [],
+        estado: ESTADOS.DISPONIBLE
     });
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedState, setSelectedState] = useState('');
-    const [activeTab, setActiveTab] = useState('Todos');
+    const [terminoBusqueda, setTerminoBusqueda] = useState('');
+    const [estadoSeleccionado, setEstadoSeleccionado] = useState('');
+    const [pestanaActiva, setPestanaActiva] = useState('todos');
 
-    const handleShowView = () => setShowViewModal(true);
-    const handleCloseView = () => setShowViewModal(false);
+    // Manejo de modales
+    const handleMostrarVer = (habitacion) => {
+        setDatosHabitacion(habitacion);
+        setMostrarModalVer(true);
+    };
+    const handleCerrarVer = () => setMostrarModalVer(false);
 
+    // Efectos para cargar y filtrar habitaciones
     useEffect(() => {
-        fetchRooms();
+        obtenerHabitaciones();
     }, []);
 
     useEffect(() => {
-        filterRooms();
-    }, [rooms, searchTerm, selectedState, activeTab]);
+        filtrarHabitaciones();
+    }, [habitaciones, terminoBusqueda, estadoSeleccionado, pestanaActiva]);
 
-    const fetchRooms = async () => {
+    // Función para obtener habitaciones
+    const obtenerHabitaciones = async () => {
         try {
             const data = await roomsCalls.GetRooms();
-            setRooms(data);
+            console.log('Habitaciones sin formato:', data); // Debug log
+            const habitacionesFormateadas = data.map(room => ({
+                id: room.id,
+                nombre: room.name || room.nombre || 'Sin nombre',
+                tipo: room.type || room.tipo || 'Estándar',
+                precio: parseFloat(room.price || room.precio || 0),
+                descripcion: room.description || room.descripcion || 'Sin descripción',
+                capacidad: parseInt(room.capacity || room.capacidad || 2),
+                estado: room.status || room.estado || ESTADOS.NO_DISPONIBLE,
+                servicios: room.services || room.servicios || [],
+                imagen: room.image || room.imagen
+            }));
+            console.log('Habitaciones formateadas:', habitacionesFormateadas); // Debug log
+            setHabitaciones(habitacionesFormateadas);
+            setHabitacionesFiltradas(habitacionesFormateadas);
         } catch (error) {
-            console.error('Error fetching rooms:', error);
+            console.error('Error al obtener habitaciones:', error);
             Swal.fire('Error', 'No se pudieron cargar las habitaciones', 'error');
         }
     };
 
-    const handleShow = () => setShowModal(true);
-    const handleClose = () => {
-        setShowModal(false);
-        setRoomData({ id: '', name: '', type: '', price: '', description: '', capacity: '', available: false, services: [] });
+    // Manejo de modales
+    const handleMostrar = () => setMostrarModal(true);
+    const handleCerrar = () => {
+        setMostrarModal(false);
+        setDatosHabitacion({ id: '', nombre: '', tipo: '', precio: '', descripcion: '', capacidad: '', disponible: false, servicios: [] });
     };
 
-    const handleInputChange = (e) => {
+    // Manejo de cambios en los inputs
+    const handleCambioInput = (e) => {
         const { name, value } = e.target;
-        setRoomData({ ...roomData, [name]: value });
+        setDatosHabitacion({ ...datosHabitacion, [name]: value });
     };
 
-    const handleSaveRoom = async () => {
+    // Guardar habitación
+    const handleGuardarHabitacion = async () => {
         try {
-            if (!roomData.id) {
-                const newRoomData = {
-                    ...roomData,
+            if (!datosHabitacion.id) {
+                const nuevaHabitacion = {
+                    ...datosHabitacion,
                     id: `HAB-${Date.now().toString(34).toUpperCase()}`
                 };
-                const newRoom = await roomsCalls.AddRoom(newRoomData);
-                setRooms(prev => [...prev, newRoom]);
+                const habitacionAgregada = await roomsCalls.AddRoom(nuevaHabitacion);
+                setHabitaciones(prev => [...prev, habitacionAgregada]);
                 Swal.fire('Éxito', 'Habitación añadida correctamente', 'success');
             } else {
-                await roomsCalls.UpdateRoom(roomData);
-                setRooms(prev => prev.map(r => r.id === roomData.id ? roomData : r));
+                await roomsCalls.UpdateRoom(datosHabitacion);
+                setHabitaciones(prev => prev.map(h => h.id === datosHabitacion.id ? datosHabitacion : h));
                 Swal.fire('Éxito', 'Habitación actualizada correctamente', 'success');
             }
-            handleClose();
+            handleCerrar();
         } catch (error) {
-            console.error('Error saving room:', error);
+            console.error('Error al guardar habitación:', error);
             Swal.fire('Error', 'No se pudo guardar la habitación', 'error');
         }
     };
 
-    const handleDeleteRoom = async (id) => {
+    // Eliminar habitación
+    const handleEliminarHabitacion = async (id) => {
         try {
             await roomsCalls.DeleteRoom(id);
             Swal.fire('Éxito', 'Habitación eliminada correctamente', 'success');
-            fetchRooms();
+            obtenerHabitaciones();
         } catch (error) {
-            console.error('Error deleting room:', error);
+            console.error('Error al eliminar habitación:', error);
             Swal.fire('Error', 'No se pudo eliminar la habitación', 'error');
         }
     };
 
-    const filterRooms = () => {
-        let filtered = rooms;
+    // Filtrar habitaciones
+    const filtrarHabitaciones = () => {
+        let filtradas = habitaciones;
 
-        if (searchTerm) {
-            filtered = filtered.filter(room =>
-                room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                room.description.toLowerCase().includes(searchTerm.toLowerCase())
+        if (terminoBusqueda) {
+            filtradas = filtradas.filter(habitacion =>
+                habitacion.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+                habitacion.tipo.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+                habitacion.descripcion.toLowerCase().includes(terminoBusqueda.toLowerCase())
             );
         }
 
-        if (selectedState) {
-            filtered = filtered.filter(room => room.available === (selectedState === 'Disponible'));
+        if (pestanaActiva !== 'todos') {
+            filtradas = filtradas.filter(habitacion => habitacion.estado === pestanaActiva);
         }
 
-        if (activeTab !== 'Todos') {
-            filtered = filtered.filter(room => room.available === (activeTab === 'Disponible'));
-        }
-
-        setFilteredRooms(filtered);
+        setHabitacionesFiltradas(filtradas);
     };
 
-    const clearFilter = () => {
-        setSearchTerm('');
-        setSelectedState('');
+    // Limpiar filtros
+    const limpiarFiltro = () => {
+        setTerminoBusqueda('');
+        setEstadoSeleccionado('');
     };
-
-    const uniqueStates = ['Todos', 'Disponible', 'No Disponible', 'En Mantenimiento', 'Ocupada' ];
 
     return (
         <Container className="containerRooms py-5">
@@ -136,7 +161,7 @@ function AdminRooms() {
                         <Col xs="auto">
                             <Button
                                 variant="primary"
-                                onClick={handleShow}
+                                onClick={handleMostrar}
                                 className="d-flex align-items-center rounded-3 px-4"
                                 size="lg">
                                 <FilePlus className='bi bi-plus-circle-fill me-2' />
@@ -145,51 +170,36 @@ function AdminRooms() {
                         </Col>
                     </Row>
 
-
-
                     <Row className="mb-3 mt-3">
-
                         <Col>
-
                             <InputGroup>
-
-                                <Nav variant="tabs" activeKey={activeTab} onSelect={(selectedKey) => setActiveTab(selectedKey)}>
+                                <Nav variant="tabs" activeKey={pestanaActiva} onSelect={(selectedKey) => setPestanaActiva(selectedKey)}>
                                     <Nav.Item>
-                                        <Nav.Link eventKey="Todos">Todos</Nav.Link>
+                                        <Nav.Link eventKey="todos">Todos</Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item>
-                                        <Nav.Link eventKey="Disponible">Disponible</Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item>
-                                        <Nav.Link eventKey="No Disponible">No Disponible</Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item>
-                                        <Nav.Link eventKey="En Mantenimiento">En Mantenimiento</Nav.Link>
-                                    </Nav.Item>
+                                    {LISTA_ESTADOS.map(estado => (
+                                        <Nav.Item key={estado.valor}>
+                                            <Nav.Link eventKey={estado.valor}>
+                                                {estado.etiqueta}
+                                            </Nav.Link>
+                                        </Nav.Item>
+                                    ))}
                                 </Nav>
-
                             </InputGroup>
-
                         </Col>
-
                         <Col>
                             <InputGroup>
                                 <Form.Control
                                     type="text"
                                     placeholder="Buscar..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    value={terminoBusqueda}
+                                    onChange={(e) => setTerminoBusqueda(e.target.value)}
                                 />
-                                <Button variant="secondary" onClick={filterRooms}>Filtrar</Button>
-                                <Button variant="danger" onClick={clearFilter}>X LIMPIAR</Button>
+                                <Button variant="secondary" onClick={filtrarHabitaciones}>Filtrar</Button>
+                                <Button variant="danger" onClick={limpiarFiltro}>X LIMPIAR</Button>
                             </InputGroup>
                         </Col>
-
-
-
                     </Row>
-
-                    
 
                     <Table striped bordered hover responsive className="align-middle table-hover">
                         <thead>
@@ -205,42 +215,41 @@ function AdminRooms() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRooms.length > 0 ? (
-                                filteredRooms.map(room => (
-                                    <tr key={room.id} className="align-middle">
-                                        <td className="text-center fw-bold text-primary">{room.id}</td>
-                                        <td className="fw-semibold">{room.name}</td>
-                                        <td>{room.type}</td>
-                                        <td className="text-center fw-bold">${room.price}</td>
-                                        <td className="text-center">{room.capacity} personas</td>
-                                        <td className="text-truncate" style={{ maxWidth: '250px' }}>{room.description}</td>
+                            {habitacionesFiltradas.length > 0 ? (
+                                habitacionesFiltradas.map(habitacion => (
+                                    <tr key={habitacion.id} className="align-middle">
+                                        <td className="text-center fw-bold text-primary">{habitacion.id}</td>
+                                        <td className="fw-semibold">{habitacion.nombre}</td>
+                                        <td>{habitacion.tipo}</td>
+                                        <td className="text-center fw-bold">
+                                            ${habitacion.precio.toLocaleString()}
+                                        </td>
+                                        <td className="text-center">{habitacion.capacidad} personas</td>
+                                        <td className="text-truncate" style={{ maxWidth: '250px' }}>
+                                            {habitacion.descripcion}
+                                        </td>
                                         <td className="text-center">
-                                            <Badge
-                                                bg={room.available ? 'success' : 'danger'}
-                                                className="px-3 py-2 rounded-pill fw-semibold"
-                                            >
-                                                {room.available ? 'Disponible' : 'No Disponible'}
-                                            </Badge>
+                                            <EstadoBadge estado={habitacion.estado} />
                                         </td>
                                         <td className="text-center">
                                             <Button
                                                 variant="outline-warning"
                                                 className="me-2 mb-1 mb-md-0 rounded-3"
-                                                onClick={() => { setRoomData(room); handleShow(); }}
+                                                onClick={() => { setDatosHabitacion(habitacion); handleMostrar(); }}
                                             >
                                                 <i className="bi bi-pencil-square me-1"></i> Editar
                                             </Button>
                                             <Button
                                                 variant="outline-info"
                                                 className="me-2 mb-1 mb-md-0 rounded-3"
-                                                onClick={() => { setRoomData(room); handleShowView(); }}
+                                                onClick={() => handleMostrarVer(habitacion)}
                                             >
                                                 <i className="bi bi-eye me-1"></i> Ver
                                             </Button>
                                             <Button
                                                 variant="outline-danger"
                                                 className="rounded-3"
-                                                onClick={() => handleDeleteRoom(room.id)}
+                                                onClick={() => handleEliminarHabitacion(habitacion.id)}
                                             >
                                                 <i className="bi bi-trash-fill me-1"></i> Eliminar
                                             </Button>
@@ -255,7 +264,7 @@ function AdminRooms() {
                                         <Button
                                             variant="primary"
                                             className="rounded-3 px-4"
-                                            onClick={handleShow}
+                                            onClick={handleMostrar}
                                         >
                                             <i className="bi bi-plus-circle me-2"></i>
                                             Añadir una habitación
@@ -269,16 +278,17 @@ function AdminRooms() {
             </Card>
 
             <RoomModal
-                show={showModal}
-                handleClose={handleClose}
-                roomData={roomData}
-                handleInputChange={handleInputChange}
-                handleSaveRoom={handleSaveRoom}
+                show={mostrarModal}
+                handleClose={handleCerrar}
+                roomData={datosHabitacion}
+                handleInputChange={handleCambioInput}
+                handleSaveRoom={handleGuardarHabitacion}
             />
             <RoomModalVer
-                show={showViewModal}
-                handleClose={handleCloseView}
-                roomData={roomData}
+                show={mostrarModalVer}
+                handleClose={handleCerrarVer}
+                roomData={datosHabitacion}
+                onHide={handleCerrarVer}
             />
         </Container>
     );
