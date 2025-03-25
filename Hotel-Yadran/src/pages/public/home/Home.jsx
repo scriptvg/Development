@@ -9,6 +9,8 @@ function Home() {
     <BarraNav/>
     <Hero/>
 
+    
+
 </>
   )
 }

@@ -115,7 +115,8 @@ function LoginForm() {
     /* Validar */
     const validarForm = () => {
         const errores = {};
-    let esValido = true;
+        let esValido = true;
+
         if (!formData.correo) {
             errores.correo = "El correo es obligatorio";
             esValido = false;

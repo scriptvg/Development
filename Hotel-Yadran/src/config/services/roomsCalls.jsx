@@ -36,7 +36,8 @@ async function AddRoom(roomData) {
             body: JSON.stringify(roomData),
         });
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorDetails = await response.json();
+            throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails.message}`);
         }
         return await response.json();
     } catch (error) {

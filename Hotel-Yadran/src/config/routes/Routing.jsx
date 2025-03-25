@@ -5,6 +5,7 @@ const RUTA_RAIZ = '/';
 const RUTA_LOGIN = '/login';
 const RUTA_DASHBOARD = '/dashboard/*';
 const RUTA_HABITACIONES = '/habitaciones/*';
+const RUTA_TEST = '/test/';
 
 /* Dependencia de las rutas */
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -16,6 +17,7 @@ import RutaProtegida from '../../components/security/RutaProtegida';
 import Home from '../../pages/public/home/Home';
 import Admin from '../../pages/admin/Admin';
 import Login from '../../pages/auth/Login';
+import TestPage from '../../pages/test/TestPage';
 
 /* Componente principal de enrutamiento */
 function Routing() {
@@ -29,6 +31,9 @@ function Routing() {
 
                 {/* Ruta de autenticación */}
                 <Route path={RUTA_LOGIN} element={<Login/>}/>
+
+                {/* Ruta de pruebas */}
+                <Route path={RUTA_TEST} element={<TestPage/>}/>
 
                 {/* Rutas protegidas para administración */}
                 <Route 
