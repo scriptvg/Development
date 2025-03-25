@@ -3,6 +3,7 @@ import React from 'react'
 /* Constantes de rutas */
 const RUTA_RAIZ = '/';
 const RUTA_LOGIN = '/login';
+const RUTA_REGISTRO = '/register';
 const RUTA_DASHBOARD = '/dashboard/*';
 const RUTA_HABITACIONES = '/habitaciones/*';
 const RUTA_TEST = '/test/';
@@ -17,6 +18,7 @@ import RutaProtegida from '../../components/security/RutaProtegida';
 import Home from '../../pages/public/home/Home';
 import Admin from '../../pages/admin/Admin';
 import Login from '../../pages/auth/Login';
+import Register from '../../pages/auth/Register';
 import TestPage from '../../pages/test/TestPage';
 
 /* Componente principal de enrutamiento */
@@ -31,6 +33,9 @@ function Routing() {
 
                 {/* Ruta de autenticación */}
                 <Route path={RUTA_LOGIN} element={<Login/>}/>
+                
+                {/* Ruta de autenticación */}
+                <Route path={RUTA_REGISTRO} element={<Register/>}/>
 
                 {/* Ruta de pruebas */}
                 <Route path={RUTA_TEST} element={<TestPage/>}/>

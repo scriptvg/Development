@@ -1,12 +1,16 @@
 import React from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Wrench, FilePlus, CirclePlus, X } from 'lucide-react';
 
 export const TAMAÑO_ICONO = 18;
 
 export const ESTADOS = {
-    DISPONIBLE: 'disponible',
-    NO_DISPONIBLE: 'no_disponible',
-    MANTENIMIENTO: 'mantenimiento'
+    DISPONIBLE: 'Disponible',
+    NO_DISPONIBLE: 'No disponible',
+    MANTENIMIENTO: 'Mantenimiento',
+    RESERVADO: 'Reservado',
+    CANCELADO: 'Reserva cancelada',
+    EN_CURSO: 'En Curso',
+    EN_PROCESO: 'En Proceso',
 };
 
 export const LISTA_ESTADOS = [
@@ -14,19 +18,43 @@ export const LISTA_ESTADOS = [
         valor: ESTADOS.DISPONIBLE, 
         etiqueta: 'Disponible', 
         IconoComponente: CheckCircle,
-        variante: 'success'
+        variante: 'success',
+        icono: <CheckCircle size={TAMAÑO_ICONO} />
     },
     { 
         valor: ESTADOS.NO_DISPONIBLE, 
         etiqueta: 'No Disponible', 
         IconoComponente: XCircle,
-        variante: 'danger'
+        variante: 'danger',
+        icono: <XCircle size={TAMAÑO_ICONO} />
     },
     { 
         valor: ESTADOS.MANTENIMIENTO, 
         etiqueta: 'En Mantenimiento', 
-        IconoComponente:XCircle,
-        variante: 'warning'
+        IconoComponente: Wrench,
+        variante: 'warning',
+        icono: <Wrench size={TAMAÑO_ICONO} />
+    },
+    {
+        valor: ESTADOS.RESERVADO, 
+        etiqueta: 'Reservado', 
+        IconoComponente: FilePlus,
+        variante: 'warning',
+        icono: <FilePlus size={TAMAÑO_ICONO} />
+    },
+    {
+        valor: ESTADOS.CANCELADO, 
+        etiqueta: 'Reserva cancelada', 
+        IconoComponente: X,
+        variante: 'warning',
+        icono: <X size={TAMAÑO_ICONO} />
+    },
+    {
+        valor: ESTADOS.EN_CURSO, 
+        etiqueta: 'En proceso', 
+        IconoComponente: CirclePlus,
+        variante: 'info',
+        icono: <CirclePlus size={TAMAÑO_ICONO} />
     }
 ];
 
