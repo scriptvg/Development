@@ -4,11 +4,11 @@ import { Wifi, AirVent, Tv, Bath, Bed, DollarSign, Users, FileText, CheckSquare,
 import { GiPalmTree } from 'react-icons/gi';
 import BadgeComponent from '../../test/BadgeComponent';
 import "../styles/roomModal.css";
-import roomDataService from '../../../config/services/roomDataService';
+import roomService from './roomService';
 import EstadoBadge from './EstadoBadge';
 
 function RoomModalVer({ show, handleClose, roomData }) {
-    const formattedRoom = roomDataService.formatRoomData(roomData);
+    const formattedRoom = roomService.formatRoomData(roomData);
     const services = formattedRoom.servicios || [];
 
     const servicesList = [

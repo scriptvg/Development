@@ -1,12 +1,15 @@
 import React from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, Clock, Brush, Calendar, Search } from 'lucide-react';
 
 export const TAMAÑO_ICONO = 18;
 
 export const ESTADOS = {
     DISPONIBLE: 'disponible',
     NO_DISPONIBLE: 'no_disponible',
-    MANTENIMIENTO: 'mantenimiento'
+    MANTENIMIENTO: 'mantenimiento',
+    LIMPIEZA: 'limpieza',
+    RESERVADA: 'reservada',
+    INSPECCION: 'inspeccion'
 };
 
 export const LISTA_ESTADOS = [
@@ -25,8 +28,26 @@ export const LISTA_ESTADOS = [
     { 
         valor: ESTADOS.MANTENIMIENTO, 
         etiqueta: 'En Mantenimiento', 
-        IconoComponente:XCircle,
+        IconoComponente: Trash2,
         variante: 'warning'
+    },
+    { 
+        valor: ESTADOS.LIMPIEZA, 
+        etiqueta: 'En Limpieza', 
+        IconoComponente: Brush,
+        variante: 'info'
+    },
+    { 
+        valor: ESTADOS.RESERVADA, 
+        etiqueta: 'Reservada', 
+        IconoComponente: Calendar,
+        variante: 'primary'
+    },
+    { 
+        valor: ESTADOS.INSPECCION, 
+        etiqueta: 'En Inspección', 
+        IconoComponente: Search,
+        variante: 'secondary'
     }
 ];
 

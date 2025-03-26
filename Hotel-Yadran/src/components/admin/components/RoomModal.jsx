@@ -194,7 +194,6 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
             <Modal.Body className="py-4 bg-white">
                 <Form className="form-section form-section-left">
                     <div className="row g-4">
-                        {/* Image Upload Section */}
                         <div className="col-12 mb-4">
                             <Form.Group controlId="formRoomImage">
                                 <Form.Label className="fw-semibold mb-2 text-dark">

@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Container, Card, Row, Col, Badge, InputGroup, Form, Dropdown, Nav } from 'react-bootstrap';
-import Swal from 'sweetalert2';
-import roomsCalls from '../../../config/services/roomsCalls';
+import { Table, Button, Container, Card, Row, Col, InputGroup, Form, Nav, DropdownButton, Dropdown } from 'react-bootstrap';
 import RoomModal from './RoomModal';
 import RoomModalVer from './RoomModalVer';
 import "../styles/adminRooms.css"
-import { CirclePlus, FilePlus } from 'lucide-react';
+import { FilePlus, Funnel, Paintbrush } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
-import { ESTADOS, LISTA_ESTADOS } from '../utils/estadosConfig';
-import roomDataService from '../../../config/services/roomDataService';
+import { ESTADOS, LISTA_ESTADOS } from '../utils/estadosConfig.jsx';
+import { OBTENER_HABITACIONES, GUARDAR_HABITACION, ELIMINAR_HABITACION, FILTRAR_HABITACIONES } from './roomService';
 
 function AdminRooms() {
     // Estados para manejar datos y modales
@@ -29,6 +27,7 @@ function AdminRooms() {
     });
     const [terminoBusqueda, setTerminoBusqueda] = useState('');
     const [estadoSeleccionado, setEstadoSeleccionado] = useState('');
+    const [filtroTexto, setFiltroTexto] = useState('Filtrar por...');
     const [pestanaActiva, setPestanaActiva] = useState('todos');
 
     // Manejo de modales
@@ -40,37 +39,13 @@ function AdminRooms() {
 
     // Efectos para cargar y filtrar habitaciones
     useEffect(() => {
-        obtenerHabitaciones();
+        OBTENER_HABITACIONES(setHabitaciones, setHabitacionesFiltradas);
     }, []);
 
     useEffect(() => {
-        filtrarHabitaciones();
+        const habitacionesFiltradas = FILTRAR_HABITACIONES(habitaciones, terminoBusqueda, estadoSeleccionado, pestanaActiva);
+        setHabitacionesFiltradas(habitacionesFiltradas);
     }, [habitaciones, terminoBusqueda, estadoSeleccionado, pestanaActiva]);
-
-    // Función para obtener habitaciones
-    const obtenerHabitaciones = async () => {
-        try {
-            const data = await roomsCalls.GetRooms();
-            console.log('Habitaciones sin formato:', data); // Debug log
-            const habitacionesFormateadas = data.map(room => ({
-                id: room.id,
-                nombre: room.name || room.nombre || 'Sin nombre',
-                tipo: room.type || room.tipo || 'Estándar',
-                precio: parseFloat(room.price || room.precio || 0),
-                descripcion: room.description || room.descripcion || 'Sin descripción',
-                capacidad: parseInt(room.capacity || room.capacidad || 2),
-                estado: room.status || room.estado || ESTADOS.NO_DISPONIBLE,
-                servicios: room.services || room.servicios || [],
-                imagen: room.image || room.imagen
-            }));
-            console.log('Habitaciones formateadas:', habitacionesFormateadas); // Debug log
-            setHabitaciones(habitacionesFormateadas);
-            setHabitacionesFiltradas(habitacionesFormateadas);
-        } catch (error) {
-            console.error('Error al obtener habitaciones:', error);
-            Swal.fire('Error', 'No se pudieron cargar las habitaciones', 'error');
-        }
-    };
 
     // Manejo de modales
     const handleMostrar = () => setMostrarModal(true);
@@ -84,65 +59,18 @@ function AdminRooms() {
         const { name, value } = e.target;
         setDatosHabitacion({ ...datosHabitacion, [name]: value });
     };
-
-    // Guardar habitación
-    const handleGuardarHabitacion = async () => {
-        try {
-            if (!datosHabitacion.id) {
-                const nuevaHabitacion = {
-                    ...datosHabitacion,
-                    id: `HAB-${Date.now().toString(34).toUpperCase()}`
-                };
-                const habitacionAgregada = await roomsCalls.AddRoom(nuevaHabitacion);
-                setHabitaciones(prev => [...prev, habitacionAgregada]);
-                Swal.fire('Éxito', 'Habitación añadida correctamente', 'success');
-            } else {
-                await roomsCalls.UpdateRoom(datosHabitacion);
-                setHabitaciones(prev => prev.map(h => h.id === datosHabitacion.id ? datosHabitacion : h));
-                Swal.fire('Éxito', 'Habitación actualizada correctamente', 'success');
-            }
-            handleCerrar();
-        } catch (error) {
-            console.error('Error al guardar habitación:', error);
-            Swal.fire('Error', 'No se pudo guardar la habitación', 'error');
-        }
-    };
-
-    // Eliminar habitación
-    const handleEliminarHabitacion = async (id) => {
-        try {
-            await roomsCalls.DeleteRoom(id);
-            Swal.fire('Éxito', 'Habitación eliminada correctamente', 'success');
-            obtenerHabitaciones();
-        } catch (error) {
-            console.error('Error al eliminar habitación:', error);
-            Swal.fire('Error', 'No se pudo eliminar la habitación', 'error');
-        }
-    };
-
-    // Filtrar habitaciones
-    const filtrarHabitaciones = () => {
-        let filtradas = habitaciones;
-
-        if (terminoBusqueda) {
-            filtradas = filtradas.filter(habitacion =>
-                habitacion.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
-                habitacion.tipo.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
-                habitacion.descripcion.toLowerCase().includes(terminoBusqueda.toLowerCase())
-            );
-        }
-
-        if (pestanaActiva !== 'todos') {
-            filtradas = filtradas.filter(habitacion => habitacion.estado === pestanaActiva);
-        }
-
-        setHabitacionesFiltradas(filtradas);
+    
+    // Agregar esta función antes del return
+    const handleFiltroSelect = (tipo, texto) => {
+        setEstadoSeleccionado(tipo);
+        setFiltroTexto(texto);
     };
 
     // Limpiar filtros
     const limpiarFiltro = () => {
         setTerminoBusqueda('');
         setEstadoSeleccionado('');
+        setFiltroTexto('Filtrar por...');
     };
 
     return (
@@ -175,12 +103,14 @@ function AdminRooms() {
                             <InputGroup>
                                 <Nav variant="tabs" activeKey={pestanaActiva} onSelect={(selectedKey) => setPestanaActiva(selectedKey)}>
                                     <Nav.Item>
-                                        <Nav.Link eventKey="todos">Todos</Nav.Link>
+                                    <Nav.Link eventKey="todos">
+                                        <i className="bi bi-list me-2"></i>Todos
+                                    </Nav.Link>
                                     </Nav.Item>
                                     {LISTA_ESTADOS.map(estado => (
                                         <Nav.Item key={estado.valor}>
                                             <Nav.Link eventKey={estado.valor}>
-                                                {estado.etiqueta}
+                                                {estado.icono}{estado.etiqueta}
                                             </Nav.Link>
                                         </Nav.Item>
                                     ))}
@@ -195,8 +125,22 @@ function AdminRooms() {
                                     value={terminoBusqueda}
                                     onChange={(e) => setTerminoBusqueda(e.target.value)}
                                 />
-                                <Button variant="secondary" onClick={filtrarHabitaciones}>Filtrar</Button>
-                                <Button variant="danger" onClick={limpiarFiltro}>X LIMPIAR</Button>
+                                <DropdownButton
+                                    as={InputGroup.Append}
+                                    variant="outline-secondary"
+                                    title={<>
+                                        <Funnel className="me-2" />
+                                        {filtroTexto}
+                                    </>}
+                                    id="input-group-dropdown-2"
+                                >
+                                    <Dropdown.Item onClick={() => handleFiltroSelect('id', 'Filtrar por ID')}>ID</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => handleFiltroSelect('nombre', 'Filtrar por Nombre')}>Nombre</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => handleFiltroSelect('tipo', 'Filtrar por Tipo')}>Tipo</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => handleFiltroSelect('precio', 'Filtrar por Precio')}>Precio</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => handleFiltroSelect('capacidad', 'Filtrar por Capacidad')}>Capacidad</Dropdown.Item>
+                                </DropdownButton>
+                                <Button variant="danger" onClick={limpiarFiltro}><Paintbrush/></Button>
                             </InputGroup>
                         </Col>
                     </Row>
@@ -249,7 +193,7 @@ function AdminRooms() {
                                             <Button
                                                 variant="outline-danger"
                                                 className="rounded-3"
-                                                onClick={() => handleEliminarHabitacion(habitacion.id)}
+                                                onClick={() => ELIMINAR_HABITACION(habitacion.id, () => OBTENER_HABITACIONES(setHabitaciones, setHabitacionesFiltradas))}
                                             >
                                                 <i className="bi bi-trash-fill me-1"></i> Eliminar
                                             </Button>
@@ -282,7 +226,15 @@ function AdminRooms() {
                 handleClose={handleCerrar}
                 roomData={datosHabitacion}
                 handleInputChange={handleCambioInput}
-                handleSaveRoom={handleGuardarHabitacion}
+                handleSaveRoom={async () => {
+                    try {
+                        await GUARDAR_HABITACION(datosHabitacion);
+                        await OBTENER_HABITACIONES(setHabitaciones, setHabitacionesFiltradas);
+                        handleCerrar();
+                    } catch (error) {
+                        console.error('Error al guardar:', error);
+                    }
+                }}
             />
             <RoomModalVer
                 show={mostrarModalVer}
