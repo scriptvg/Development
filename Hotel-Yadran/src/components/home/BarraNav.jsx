@@ -9,7 +9,17 @@ import { FaGoogle } from "react-icons/fa";
 import { SideBar } from './ui/SideBar.jsx';
 
 function BarraNav() {
-    const navigate = useNavigate();
+    // Get router hooks safely with conditional usage
+    let navigate;
+    try {
+        navigate = useNavigate();
+    } catch (error) {
+        // Handle the case when not in router context
+        navigate = (path) => {
+            window.location.href = path;
+        };
+    }
+    
     const { user, logout } = useAuth();
     const [showAdminSidebar, setShowAdminSidebar] = useState(false);
     const [showCrudSidebar, setShowCrudSidebar] = useState(false);
@@ -26,18 +36,23 @@ function BarraNav() {
     const isAdminUser = user?.email === 'velezalan34@gmail.com' && user?.rol === 'admin';
 
     const adminMenuItems = [
-        { icon: <Home size={20} />, label: 'Dashboard', path: '/dashboard' },
-        { icon: <Hotel size={20} />, label: 'Gestionar Habitaciones', path: '/admin/rooms' },
+        { icon: <Home size={20} />, label: 'Dashboard', path: '/admin' },
+        { icon: <Hotel size={20} />, label: 'Gestionar Habitaciones', path: '/admin/habitaciones' },
         { icon: <Settings size={20} />, label: 'Gestionar Servicios', path: '/admin/services' },
-        { icon: <Users size={20} />, label: 'Gestionar Usuarios', path: '/admin/users' },
+        { icon: <Users size={20} />, label: 'Gestionar Usuarios', path: '/admin/usuarios' },
         { icon: <MessageSquare size={20} />, label: 'Gestionar Testimonios', path: '/admin/testimonials' },
     ];
+
+    // Function to handle navigation
+    const handleNavigation = (path) => {
+        navigate(path);
+    };
 
     return (
         <>
             <div className="nav-container">
                 <Navbar className="navbar py-3 px-4" expand="lg" fixed="top" bg="white">
-                    <Navbar.Brand onClick={() => navigate('/')} className="brand-hover">
+                    <Navbar.Brand onClick={() => handleNavigation('/')} className="brand-hover">
                         <Image src={logo} className="brand-logo" width="40" height="40" alt="Logo de Hotel Yadran" />
                     </Navbar.Brand>
 
@@ -47,7 +62,7 @@ function BarraNav() {
                             {['Inicio', 'Habitaciones', 'Servicios', 'Testimonios', 'Contacto'].map((item, index) => (
                                 <Nav.Link 
                                     key={index}
-                                    onClick={() => navigate(item === 'Inicio' ? '/' : `/${item.toLowerCase()}`)}
+                                    onClick={() => handleNavigation(item === 'Inicio' ? '/' : `/${item.toLowerCase()}`)}
                                     className="nav-link px-4 py-2"
                                 >
                                     {item}
@@ -60,10 +75,10 @@ function BarraNav() {
                         <Nav className="auth-section">
                             {!user ? (
                                 <div className="d-flex gap-3">
-                                    <Button className="auth-btn register-btn" variant="outline-primary" onClick={() => navigate('/register')}>
+                                    <Button className="auth-btn register-btn" variant="outline-primary" onClick={() => handleNavigation('/register')}>
                                         Registrarse
                                     </Button>
-                                    <Button className="auth-btn login-btn" variant="primary" onClick={() => navigate('/login')}>
+                                    <Button className="auth-btn login-btn" variant="primary" onClick={() => handleNavigation('/login')}>
                                         Iniciar Sesión
                                     </Button>
                                 </div>
@@ -140,8 +155,8 @@ function BarraNav() {
                                 <Nav.Link
                                     key={index}
                                     onClick={() => {
-                                        navigate(item.path);
-                                        setShowSidebar(false);
+                                        handleNavigation(item.path);
+                                        setShowAdminSidebar(false);
                                     }}
                                     className="admin-menu-item"
                                 >

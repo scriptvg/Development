@@ -1,0 +1,312 @@
+/* Estilos para la paginación */
+
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-item .page-link {
+    border: none;
+    margin: 0 2px;
+    border-radius: 8px !important;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #495057;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.page-item .page-link:hover {
+    background-color: #e9ecef;
+    color: #212529;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.page-item.active .page-link {
+    background-color: #3498db;
+    color: white;
+    box-shadow: 0 3px 5px rgba(52, 152, 219, 0.2);
+}
+
+.page-item.disabled .page-link {
+    color: #adb5bd;
+    pointer-events: none;
+    background-color: #f8f9fa;
+    opacity: 0.7;
+}
+
+/* Estilos mejorados para el contenedor de paginación */
+.pagination-container {
+    background-color: #f8f9fa;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.pagination-container:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.pagination-settings {
+    display: flex;
+    align-items: center;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: white;
+    border: 1px solid #dee2e6;
+}
+
+.pagination-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.pagination-controls {
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos para el selector de items por página */
+.items-per-page {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.items-per-page select {
+    border-radius: 0.5rem;
+    padding: 0.375rem 2rem 0.375rem 1rem;
+    border: 1px solid #ced4da;
+    font-weight: 500;
+    background-color: #fff;
+}
+
+.items-per-page select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+    .pagination-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+    
+    .pagination-settings,
+    .pagination-controls {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pagination-info {
+        text-align: center;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .pagination {
+        justify-content: center;
+    }
+}
+
+/* Tab styles */
+.custom-tabs {
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1.5rem;
+}
+
+.custom-tabs .nav-item {
+    margin-right: 0.5rem;
+}
+
+.custom-tabs .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    padding: 0.75rem 1.25rem;
+    color: #6c757d;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.custom-tabs .nav-link:hover {
+    background-color: #f8f9fa;
+    color: #495057;
+    border-bottom-color: #dee2e6;
+}
+
+.custom-tabs .nav-link.active {
+    color: #3498db;
+    background-color: transparent;
+    border-bottom-color: #3498db;
+    font-weight: 600;
+}
+
+.custom-tabs .badge {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.custom-tabs .text-success.active {
+    color: #28a745 !important;
+    border-bottom-color: #28a745;
+}
+
+.custom-tabs .text-warning.active {
+    color: #ffc107 !important;
+    border-bottom-color: #ffc107;
+}
+
+.custom-tabs .text-danger.active {
+    color: #dc3545 !important;
+    border-bottom-color: #dc3545;
+}
+
+.custom-tabs .text-secondary.active {
+    color: #6c757d !important;
+    border-bottom-color: #6c757d;
+}
+
+.custom-tabs .text-muted.active {
+    color: #6c757d !important;
+    border-bottom-color: #6c757d;
+}
+
+/* Make tabs responsive */
+@media (max-width: 992px) {
+    .custom-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 5px;
+    }
+    
+    .custom-tabs .nav-item {
+        margin-right: 0;
+    }
+    
+    .custom-tabs .nav-link {
+        padding: 0.75rem 1rem;
+    }
+    
+    .custom-tabs .nav-link span:not(.badge) {
+        display: none;
+    }
+    
+    .custom-tabs .nav-link span.badge {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .custom-tabs .nav-link {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* Estilos para los botones de acción */
+.table td .btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+}
+
+.table td .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table td .btn-outline-primary:hover {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.table td .btn-outline-warning:hover {
+    background-color: #f39c12;
+    border-color: #f39c12;
+}
+
+.table td .btn-outline-danger:hover {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+/* Estilos para los botones de acción con íconos */
+.btn-icon {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon.rounded-circle {
+    border-radius: 50% !important;
+}
+
+.table td .btn-outline-primary:hover {
+    background-color: #3498db;
+    border-color: #3498db;
+    color: #fff;
+}
+
+.table td .btn-outline-warning:hover {
+    background-color: #f39c12;
+    border-color: #f39c12;
+    color: #fff;
+}
+
+.table td .btn-outline-danger:hover {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+    color: #fff;
+}
+
+/* Estilos para tooltips y popovers */
+.tooltip {
+    font-size: 0.85rem;
+    opacity: 0.95 !important;
+}
+
+.popover {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 0.95rem;
+}
+
+.popover-header {
+    font-weight: 600;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+.popover-body {
+    padding: 1rem;
+}
+
+.border-danger {
+    border-color: #dc3545 !important;
+}

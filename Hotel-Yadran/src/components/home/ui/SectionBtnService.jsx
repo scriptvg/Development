@@ -9,7 +9,7 @@ function SectionBtnService() {
     <Container>
 
         <Card.Title className="text-center">
-            Nuestras Habitaciones
+            
         </Card.Title>
 
     </Container>

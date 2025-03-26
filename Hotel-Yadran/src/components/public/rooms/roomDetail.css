@@ -1,0 +1,304 @@
+/* Room detail page styling */
+.room-detail-page {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Hero section */
+.room-detail-hero {
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    padding: 6rem 0 3rem;
+    color: #fff;
+}
+
+.breadcrumb-light .breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+
+.breadcrumb-light .breadcrumb-item a:hover {
+    color: #fff;
+}
+
+.breadcrumb-light .breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.breadcrumb-light .breadcrumb-item+.breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.hero-badge {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+}
+
+.rating-badge {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    backdrop-filter: blur(5px);
+}
+
+.pricing-badge {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-out;
+}
+
+.price-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.price-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* Room details section */
+.room-section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.room-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 50px;
+    background-color: #3498db;
+    border-radius: 3px;
+}
+
+.room-subsection-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 1.5rem 0 1rem;
+}
+
+/* Features */
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    background-color: #e9ecef;
+    transform: translateY(-3px);
+}
+
+.feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(52, 152, 219, 0.1);
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+    color: #3498db;
+}
+
+.feature-info {
+    flex: 1;
+}
+
+.feature-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+.feature-text {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+/* Services grid */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.service-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.service-item:hover {
+    background-color: #e9ecef;
+    transform: translateY(-3px);
+}
+
+.service-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(52, 152, 219, 0.1);
+    border-radius: 50%;
+    margin-bottom: 0.75rem;
+    color: #3498db;
+}
+
+.service-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Policies */
+.policy-items {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.policy-item {
+    padding: 1.25rem;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    border-left: 4px solid #3498db;
+}
+
+.policy-item h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #2c3e50;
+}
+
+.policy-item p {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.policy-item p:last-child {
+    margin-bottom: 0;
+}
+
+/* Booking card */
+.book-now-card {
+    top: 2rem;
+}
+
+.price-info {
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.price-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.availability-info {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+/* Related rooms */
+.related-rooms-section {
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.related-room-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.related-room-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.related-room-img-container {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+}
+
+.related-room-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.related-room-price {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #2c3e50;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .room-detail-hero {
+        padding: 5rem 0 2rem;
+    }
+    
+    .pricing-badge {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    
+    .book-now-card {
+        position: static !important;
+        margin-bottom: 2rem;
+    }
+    
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

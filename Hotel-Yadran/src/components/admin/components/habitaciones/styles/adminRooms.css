@@ -1,6 +1,106 @@
 .containerRooms {
-    max-width: 1400px !important;
+    max-width: 1400px;
     margin-top: 100px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --primary-color: #0062cc;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    --border-color: #dee2e6;
+    --spacing-unit: 0.5rem;
+}
+
+/* Tipografía refinada */
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.display-6 {
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+}
+
+.fs-5 {
+    font-size: 1.125rem !important;
+    letter-spacing: -0.01em;
+}
+
+/* Espaciado refinado */
+.card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    border: none;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 98, 204, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 98, 204, 0.4);
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--secondary-color);
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    color: var(--text-primary);
+}
+
+/* Mejoras para filtros y controles */
+.form-control, .form-select {
+    border-radius: 0.75rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.95rem;
+    border: 1.5px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(0, 98, 204, 0.15);
+}
+
+.input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .input-group-text {
+    border-top-left-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+    border-right: 0;
 }
 
 .scrollbar-container{
@@ -15,7 +115,6 @@
     padding: 0;
     margin: 0;
     -webkit-overflow-scrolling: touch;
-
 }
 
 .scrollbar-container::-webkit-scrollbar {
@@ -33,17 +132,13 @@
 .scrollbar-container::-webkit-scrollbar-track {
     background-color: transparent;
     border-radius: 10px;
-
 }
 
 .pestanas{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: auto;
-
 }
-
-
 
 .table th {
     font-size: 0.85rem;
@@ -70,4 +165,127 @@
 
 .badge {
     font-size: 0.85rem;
+}
+
+/* Mejorar el aspecto visual de los filtros */
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    border-color: #80bdff;
+}
+
+/* Estilos para el panel de estado */
+.estado-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.estado-badge {
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.estado-badge:hover {
+    transform: translateY(-2px);
+}
+
+.estado-badge.active {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Animación para el botón de añadir */
+.btn-primary {
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Mejor apariencia para las cards */
+.card {
+    transition: all 0.3s ease;
+    background-color: #ffffff;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+}
+
+.card-title {
+    color: #2c3e50;
+}
+
+.card-subtitle {
+    color: #7f8c8d;
+}
+
+/* Improve table layout */
+.table-responsive {
+    min-width: 100%;
+}
+
+.table th, .table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px; /* Adjust based on content */
+}
+
+.table th.service-col, .table td.service-col {
+    min-width: 200px;
+    max-width: 200px;
+}
+
+/* Fix for table on smaller screens */
+@media (max-width: 992px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .table th, .table td {
+        max-width: none;
+    }
+}
+
+/* Specific column widths */
+.table .id-column {
+    min-width: 120px;
+}
+
+.table .name-column {
+    min-width: 180px;
+}
+
+.table .type-column {
+    min-width: 120px;
+}
+
+.table .price-column {
+    min-width: 120px;
+}
+
+.table .capacity-column {
+    min-width: 100px;
+}
+
+.table .services-column {
+    min-width: 200px;
+}
+
+.table .status-column {
+    min-width: 150px;
+}
+
+.table .actions-column {
+    min-width: 150px;
 }

@@ -1,0 +1,96 @@
+.service-badge-hover {
+    transition: all 0.2s ease;
+}
+
+.service-badge-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+    filter: brightness(1.05);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.service-badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* Improve service badge display */
+.service-badge {
+    position: relative;
+    display: inline-flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+}
+
+.service-badge span.text-truncate {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: calc(100% - 24px);
+}
+
+/* Gradient variants for backgrounds */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #28a745, #208537);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #17a2b8, #117a8b);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #ffc107, #d39e00);
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, #dc3545, #bd2130);
+}
+
+.bg-gradient-dark {
+    background: linear-gradient(135deg, #343a40, #1d2124);
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+}
+
+/* Animation for badge appearance */
+@keyframes badge-appear {
+    0% {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.service-badge-animated {
+    animation: badge-appear 0.3s ease forwards;
+}
+
+/* Add specific styles for table service badges */
+.table .service-badge {
+    max-width: 150px !important;
+}
+
+/* Fix for smaller screens */
+@media (max-width: 992px) {
+    .service-badge {
+        max-width: 120px !important;
+    }
+}

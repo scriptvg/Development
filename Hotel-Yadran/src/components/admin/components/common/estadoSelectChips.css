@@ -1,0 +1,158 @@
+.estado-select-chips {
+    margin-bottom: 1rem;
+}
+
+.estado-chip {
+    cursor: pointer;
+    border: 2px solid #e9ecef;
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.estado-chip:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: #ced4da;
+}
+
+.estado-chip .chip-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.estado-chip .chip-label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Selected state styles */
+.estado-chip-selected {
+    background-color: #e7f5ff;
+    border-color: #4dabf7;
+    box-shadow: 0 3px 6px rgba(0, 123, 255, 0.15);
+}
+
+/* Size variants */
+.estado-chip-sm {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.estado-chip-lg {
+    padding: 1rem 0.75rem;
+    font-size: 1.125rem;
+}
+
+/* Color variants */
+.estado-chip-success.estado-chip-selected {
+    background-color: rgba(40, 167, 69, 0.1);
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.estado-chip-warning.estado-chip-selected {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+.estado-chip-danger.estado-chip-selected {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.estado-chip-secondary.estado-chip-selected {
+    background-color: rgba(108, 117, 125, 0.1);
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.estado-chip-dark.estado-chip-selected {
+    background-color: rgba(52, 58, 64, 0.1);
+    border-color: #343a40;
+    color: #343a40;
+}
+
+.estado-chip-info.estado-chip-selected {
+    background-color: rgba(23, 162, 184, 0.1);
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+.estado-chip-badge {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+}
+
+.estado-chip-badge:hover {
+    transform: translateY(-2px);
+    /* Remove the box shadow on hover */
+}
+
+.estado-chip-badge.selected {
+    transform: translateY(-1px);
+    /* Remove the box shadow on selection, replace with subtle border */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.estado-chip-badge .badge {
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    height: 100%;
+    min-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    justify-content: flex-start;
+}
+
+.estado-chip-badge span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Fix for badge width and text overflow */
+.estado-chip-badge .badge span {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.estado-chip-badge.selected .badge {
+    font-weight: 600;
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+    .estado-chip {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.875rem;
+    }
+    
+    .estado-chip .chip-label {
+        font-size: 0.8rem;
+    }
+
+    .estado-chip-badge .badge {
+        font-size: 0.8rem;
+    }
+}

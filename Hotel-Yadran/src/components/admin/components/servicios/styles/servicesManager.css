@@ -1,0 +1,182 @@
+/* Services Manager Styles */
+.services-manager {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Stats row */
+.stats-row {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.stats-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+}
+
+.stats-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.stats-value {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #2c3e50;
+}
+
+/* Service card styling */
+.service-card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.service-actions .btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.service-icon-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.service-icon-bg {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    text-align: center;
+}
+
+.service-value {
+    text-align: center;
+}
+
+.service-description {
+    text-align: center;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+/* Table view styles */
+.service-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+
+/* Icon selector modal */
+.icon-selector-modal .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.icon-grid {
+    padding: 1rem;
+}
+
+.icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.icon-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-3px);
+}
+
+.icon-item.selected {
+    background-color: rgba(13, 110, 253, 0.1);
+    border: 1px solid rgba(13, 110, 253, 0.2);
+}
+
+.icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.selected-indicator {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background-color: #198754;
+    color: white;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+.icon-name {
+    font-size: 0.8rem;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.icon-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .service-icon-bg {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .stats-value {
+        font-size: 1.1rem;
+    }
+    
+    .icon-item {
+        padding: 0.75rem;
+    }
+    
+    .icon-container {
+        width: 36px;
+        height: 36px;
+    }
+}

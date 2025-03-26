@@ -1,83 +1,127 @@
 import React from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, OverlayTrigger, Tooltip, Badge } from 'react-bootstrap';
+import { Edit2, Eye, Trash2, AlertCircle } from 'lucide-react';
 import EstadoBadge from '../../utils/EstadoBadge';
 
-const RoomsTable = ({ habitacionesFiltradas, handleMostrar, handleMostrarVer, handleEliminarHabitacion }) => {
+const RoomsTable = ({ habitacionesFiltradas, handleMostrar, handleMostrarVer, handleMostrarEditar, handleEliminarHabitacion }) => {
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('es-CL', {
+            style: 'currency',
+            currency: 'CLP'
+        }).format(price);
+    };
+
     return (
-        <Table striped bordered hover responsive className="align-middle table-hover">
-            <thead>
-                <tr className="bg-light">
-                    <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">ID</th>
-                    <th className="py-3 text-uppercase fs-6 fw-bold text-secondary">Nombre</th>
-                    <th className="py-3 text-uppercase fs-6 fw-bold text-secondary">Tipo</th>
-                    <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">Precio</th>
-                    <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">Capacidad</th>
-                    <th className="py-3 text-uppercase fs-6 fw-bold text-secondary">Descripción</th>
-                    <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">Estado</th>
-                    <th className="text-center py-3 text-uppercase fs-6 fw-bold text-secondary">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {habitacionesFiltradas.length > 0 ? (
-                    habitacionesFiltradas.map(habitacion => (
-                        <tr key={habitacion.id} className="align-middle">
-                            <td className="text-center fw-bold text-primary">{habitacion.id}</td>
-                            <td className="fw-semibold">{habitacion.nombre}</td>
-                            <td>{habitacion.tipo}</td>
-                            <td className="text-center fw-bold">
-                                ${habitacion.precio.toLocaleString()}
-                            </td>
-                            <td className="text-center">{habitacion.capacidad} personas</td>
-                            <td className="text-truncate" style={{ maxWidth: '250px' }}>
-                                {habitacion.descripcion}
-                            </td>
-                            <td className="text-center">
-                                <EstadoBadge estado={habitacion.estado} />
-                            </td>
-                            <td className="text-center">
+        <div className="table-responsive">
+            <Table hover className="align-middle shadow-sm border-top mb-0">
+                <thead>
+                    <tr className="bg-light">
+                        <th className="text-center py-3 px-4 text-uppercase fs-6 fw-bold text-primary" style={{width: '80px'}}>ID</th>
+                        <th className="py-3 px-4 text-uppercase fs-6 fw-bold text-primary">Nombre</th>
+                        <th className="py-3 px-4 text-uppercase fs-6 fw-bold text-primary">Tipo</th>
+                        <th className="text-end py-3 px-4 text-uppercase fs-6 fw-bold text-primary">Precio</th>
+                        <th className="text-center py-3 px-4 text-uppercase fs-6 fw-bold text-primary">Capacidad</th>
+                        <th className="text-center py-3 px-4 text-uppercase fs-6 fw-bold text-primary">Estado</th>
+                        <th className="text-end py-3 px-4 text-uppercase fs-6 fw-bold text-primary">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {habitacionesFiltradas.length > 0 ? (
+                        habitacionesFiltradas.map(habitacion => (
+                            <tr key={habitacion.id} className="border-bottom">
+                                <td className="text-center px-4">
+                                    <Badge bg="light" text="dark" className="px-2 py-1">
+                                        #{habitacion.id}
+                                    </Badge>
+                                </td>
+                                <td className="px-4">
+                                    <div className="fw-semibold">{habitacion.nombre}</div>
+                                    <small className="text-muted text-truncate d-block" style={{maxWidth: '200px'}}>
+                                        {habitacion.descripcion}
+                                    </small>
+                                </td>
+                                <td className="px-4">
+                                    <Badge bg="light" text="dark" className="px-3 py-2">
+                                        {habitacion.tipo}
+                                    </Badge>
+                                </td>
+                                <td className="text-end px-4 fw-bold">
+                                    {formatPrice(habitacion.precio)}
+                                </td>
+                                <td className="text-center px-4">
+                                    <Badge bg="info" className="px-2 py-1">
+                                        {habitacion.capacidad} personas
+                                    </Badge>
+                                </td>
+                                <td className="text-center px-4">
+                                    <EstadoBadge estado={habitacion.estado} />
+                                </td>
+                                <td className="text-end px-4">
+                                    <div className="d-flex gap-2 justify-content-end">
+                                        <OverlayTrigger
+                                            placement="top"
+                                            overlay={<Tooltip>Ver detalles</Tooltip>}
+                                        >
+                                            <Button
+                                                variant="light"
+                                                size="sm"
+                                                className="d-flex align-items-center p-2"
+                                                onClick={() => handleMostrarVer(habitacion)}
+                                            >
+                                                <Eye size={16} />
+                                            </Button>
+                                        </OverlayTrigger>
+
+                                        <OverlayTrigger
+                                            placement="top"
+                                            overlay={<Tooltip>Editar habitación</Tooltip>}
+                                        >
+                                            <Button
+                                                variant="light"
+                                                size="sm"
+                                                className="d-flex align-items-center p-2"
+                                                onClick={() => handleMostrarEditar(habitacion)}
+                                            >
+                                                <Edit2 size={16} />
+                                            </Button>
+                                        </OverlayTrigger>
+
+                                        <OverlayTrigger
+                                            placement="top"
+                                            overlay={<Tooltip>Eliminar habitación</Tooltip>}
+                                        >
+                                            <Button
+                                                variant="light"
+                                                size="sm"
+                                                className="d-flex align-items-center p-2 text-danger"
+                                                onClick={() => handleEliminarHabitacion(habitacion.id)}
+                                            >
+                                                <Trash2 size={16} />
+                                            </Button>
+                                        </OverlayTrigger>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="7" className="text-center py-5">
+                                <AlertCircle size={40} className="text-secondary mb-3" />
+                                <p className="text-secondary mb-3">No hay habitaciones disponibles</p>
                                 <Button
-                                    variant="outline-warning"
-                                    className="me-2 mb-1 mb-md-0 rounded-3"
-                                    onClick={() => { handleMostrar(habitacion); }}
+                                    variant="primary"
+                                    className="px-4"
+                                    onClick={handleMostrar}
                                 >
-                                    <i className="bi bi-pencil-square me-1"></i> Editar
-                                </Button>
-                                <Button
-                                    variant="outline-info"
-                                    className="me-2 mb-1 mb-md-0 rounded-3"
-                                    onClick={() => handleMostrarVer(habitacion)}
-                                >
-                                    <i className="bi bi-eye me-1"></i> Ver
-                                </Button>
-                                <Button
-                                    variant="outline-danger"
-                                    className="rounded-3"
-                                    onClick={() => handleEliminarHabitacion(habitacion.id)}
-                                >
-                                    <i className="bi bi-trash-fill me-1"></i> Eliminar
+                                    Añadir habitación
                                 </Button>
                             </td>
                         </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan="8" className="text-center py-5">
-                            <i className="bi bi-inbox-fill text-secondary fs-1 mb-3 d-block"></i>
-                            <p className="mb-3 text-secondary fs-5">No hay habitaciones disponibles</p>
-                            <Button
-                                variant="primary"
-                                className="rounded-3 px-4"
-                                onClick={handleMostrar}
-                            >
-                                <i className="bi bi-plus-circle me-2"></i>
-                                Añadir una habitación
-                            </Button>
-                        </td>
-                    </tr>
-                )}
-            </tbody>
-        </Table>
+                    )}
+                </tbody>
+            </Table>
+        </div>
     );
 };
 
-export default RoomsTable; 
+export default RoomsTable;

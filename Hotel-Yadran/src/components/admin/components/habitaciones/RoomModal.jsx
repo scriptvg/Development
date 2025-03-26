@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form, Container } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap/dist/js/bootstrap.bundle.min.js"
 import BadgeComponent from '../../utils/BadgeComponent';
+import EstadoSelectChips from '../../components/common/EstadoSelectChips';
 import "./styles/roomModal.css"
-import { Wifi, AirVent, Tv, Bath, Bed, DollarSign, Users, FileText, CheckSquare, Hash, Image } from 'lucide-react';
-import { GiPalmTree } from 'react-icons/gi';
+import { Bed, DollarSign, Users, FileText, Hash, Image } from 'lucide-react';
 import Swal from 'sweetalert2';
-import EstadoSelectModal from '../../utils/EstadoSelectModal';
+import { LISTA_SERVICIOS, SERVICIOS } from '../../utils/ServicesConfig.jsx';
+import { ESTADOS } from '../../utils/estadosConfig.jsx';
+import './styles/modalStyles.css';
 
 /* Constantes de configuración */
 const TAMAÑOS = {
@@ -25,32 +27,37 @@ const DIMENSIONES = {
     MODAL: 'lg'
 };
 
-const SERVICIOS = {
-    WIFI: 'wifi',
-    AIRE: 'aire_acondicionado',
-    TV: 'tv',
-    VISTA_MAR: 'vista_al_mar',
-    BAÑO: 'bano_privado'
-};
-
-const LISTA_SERVICIOS = [
-    { valor: SERVICIOS.WIFI, etiqueta: 'Wi-Fi', icono: <Wifi size={TAMAÑOS.ICONO_NORMAL} /> },
-    { valor: SERVICIOS.AIRE, etiqueta: 'Aire Acondicionado', icono: <AirVent size={TAMAÑOS.ICONO_NORMAL} /> },
-    { valor: SERVICIOS.TV, etiqueta: 'Smart TV', icono: <Tv size={TAMAÑOS.ICONO_NORMAL} /> },
-    { valor: SERVICIOS.VISTA_MAR, etiqueta: 'Vista al Mar', icono: <GiPalmTree size={TAMAÑOS.ICONO_NORMAL} /> },
-    { valor: SERVICIOS.BAÑO, etiqueta: 'Baño Privado', icono: <Bath size={TAMAÑOS.ICONO_NORMAL} /> }
-];
-
-const ESTADOS = {
-    DISPONIBLE: 'disponible',
-    NO_DISPONIBLE: 'no_disponible',
-    MANTENIMIENTO: 'mantenimiento'
-};
-
 /* Componente modal de habitaciones */
-const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveRoom: externalHandleSaveRoom }) => {
-    const [previewImagen, setPreviewImagen] = useState(roomData.image || null);
-    const servicios = Array.isArray(roomData.services) ? roomData.services : [];
+const RoomModal = ({ show, handleClose, handleSaveRoom: externalHandleSaveRoom }) => {
+    const [roomData, setRoomData] = useState({
+        name: '',
+        type: '',
+        price: '',
+        capacity: '',
+        description: '',
+        image: null,
+        services: [], // Make sure this is initialized as an empty array
+        estado: ESTADOS.DISPONIBLE
+    });
+    
+    const [previewImagen, setPreviewImagen] = useState(null);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setRoomData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    // Añadir useEffect para actualizar el preview cuando cambian los datos
+    useEffect(() => {
+        if (roomData.image) {
+            setPreviewImagen(roomData.image);
+        } else {
+            setPreviewImagen(null);
+        }
+    }, [roomData.image]);
 
     /* Función de validación del formulario */
     const validarFormulario = () => {
@@ -110,33 +117,39 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
         }
 
         try {
-        if (typeof externalHandleSaveRoom === 'function') {
+            // Convertir los datos al formato esperado por el backend
+            const roomToSave = {
+                nombre: roomData.name,
+                tipo: roomData.type,
+                precio: parseFloat(roomData.price),
+                capacidad: parseInt(roomData.capacity),
+                descripcion: roomData.description,
+                imagen: roomData.image,
+                servicios: roomData.services,
+                estado: roomData.estado
+            };
+
+            if (typeof externalHandleSaveRoom === 'function') {
                 await Swal.fire({
                     title: '¿Estás seguro?',
-                    text: roomData.id ? 
-                        "¿Deseas actualizar esta habitación?" : 
-                        "¿Deseas añadir esta nueva habitación?",
+                    text: "¿Deseas añadir esta nueva habitación?",
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: roomData.id ? 'Sí, actualizar' : 'Sí, añadir',
+                    confirmButtonText: 'Sí, añadir',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-            externalHandleSaveRoom(roomData);
+                        externalHandleSaveRoom(roomToSave);
+                        handleClose();
                         Swal.fire(
                             '¡Completado!',
-                            roomData.id ? 
-                                'La habitación ha sido actualizada exitosamente.' : 
-                                'La habitación ha sido añadida exitosamente.',
+                            'La habitación ha sido añadida exitosamente.',
                             'success'
                         );
                     }
                 });
-        } else {
-            console.warn('No handleSaveRoom function provided to RoomModal');
-            handleClose();
             }
         } catch (error) {
             await Swal.fire({
@@ -149,23 +162,22 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
     };
 
     const handleServiceChange = (serviceValue) => {
-        const updatedServices = servicios.includes(serviceValue)
-            ? servicios.filter(service => service !== serviceValue)
-            : [...servicios, serviceValue];
+        const currentServices = Array.isArray(roomData.services) ? roomData.services : [];
+        const updatedServices = currentServices.includes(serviceValue)
+            ? currentServices.filter(service => service !== serviceValue)
+            : [...currentServices, serviceValue];
         
-        handleInputChange({ target: { name: 'services', value: updatedServices } });
+        setRoomData(prev => ({
+            ...prev,
+            services: updatedServices
+        }));
     };
 
     const obtenerIconoServicio = (servicio) => {
-        const iconSize = TAMAÑOS.ICONO_GRANDE;
-        switch (servicio) {
-            case SERVICIOS.WIFI: return <Wifi size={iconSize} />;
-            case SERVICIOS.AIRE: return <AirVent size={iconSize} />;
-            case SERVICIOS.TV: return <Tv size={iconSize} />;
-            case SERVICIOS.VISTA_MAR: return <GiPalmTree size={iconSize} />;
-            case SERVICIOS.BAÑO: return <Bath size={iconSize} />;
-            default: return null;
-        }
+        const service = LISTA_SERVICIOS.find(s => s.valor === servicio);
+        if (!service) return null;
+        
+        return React.cloneElement(service.icono, { size: TAMAÑOS.ICONO_GRANDE });
     };
 
     return (
@@ -174,21 +186,14 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
             onHide={handleClose} 
             centered 
             className="room-modal"
-            dialogClassName="modal-dialog-centered modal-dialog-scrollable"
-            size={DIMENSIONES.MODAL}
+            size="lg"
         >
-            <Modal.Header closeButton className="border-bottom bg-light">
-                <Modal.Title className="d-flex align-items-center justify-content-between w-100">
-                    <div className="d-flex align-items-center">
-                        <Bed className="me-3 text-primary" size={28} />
-                        <span className="h4 mb-0">
-                            {roomData.id ? 'Editar Habitación' : 'Añadir Habitación'}
-                        </span>
-                    </div>
-                    <div className="badge bg-secondary d-flex align-items-center">
-                        <Hash size={14} className="me-1" />
-                        <span className="fs-6">{roomData.id || 'Nueva'}</span>
-                    </div>
+            <Modal.Header closeButton>
+                <Modal.Title className="d-flex align-items-center gap-2">
+                    <Bed className="text-primary" size={28} />
+                    <span className="h4 mb-0">
+                        Nueva Habitación
+                    </span>
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body className="py-4 bg-white">
@@ -322,28 +327,31 @@ const RoomModal = ({ show, handleClose, roomData, handleInputChange, handleSaveR
                             
                             <Form.Label className="h5 mb-3 text-primary">Servicios Disponibles</Form.Label>
 
-                            <Container className="d-flex flex-wrap gap-2">
+                            <Container className="d-flex flex-wrap gap-3">
                                 {LISTA_SERVICIOS.map(servicio => (
                                     <BadgeComponent
                                         key={servicio.valor}
                                         text={servicio.etiqueta}
-                                        variant={servicios.includes(servicio.valor) ? 'info' : 'secondary'}
+                                        variant={(roomData.services || []).includes(servicio.valor) ? 'info' : 'secondary'}
                                         icon={servicio.icono}
                                         onClick={() => handleServiceChange(servicio.valor)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer service-chip"
+                                        maxWidth="auto" // Allow full width for service chips
                                     />
                                 ))}
                             </Container>
 
-                            {/* Selector de Estado */}
-                    <Container className='mb-3'>
-                        <EstadoSelectModal 
-                            estadoSeleccionado={roomData.estado || ESTADOS.DISPONIBLE}
-                            onChange={(estado) => handleInputChange({
-                                target: { name: 'estado', value: estado }
-                            })}
-                        />
-                    </Container>
+                            {/* Selector de Estado (replace with new component) */}
+                            <Container className='mb-3 mt-4'>
+                                <Form.Label className="h5 mb-3 text-primary">Estado de la Habitación</Form.Label>
+                                <EstadoSelectChips
+                                    estadoSeleccionado={roomData.estado || ESTADOS.DISPONIBLE}
+                                    onChange={(estado) => handleInputChange({
+                                        target: { name: 'estado', value: estado }
+                                    })}
+                                    className="mt-2"
+                                />
+                            </Container>
 
                         </Form.Group>
                     </Container>
