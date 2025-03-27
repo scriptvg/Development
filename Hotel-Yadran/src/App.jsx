@@ -11,29 +11,34 @@ import Footer from './components/common/Footer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './config/context/auth/useAuth';
+import { Container } from 'react-bootstrap';
+import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="d-flex flex-column min-vh-100">
-          <BarraNav />
-          <div className="flex-grow-1">
-            <ToastContainer />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/admin/*" element={<Admin />} />
-              <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
-              <Route path="/habitaciones" element={<PublicRooms />} />
-              <Route path="/habitaciones/:roomId" element={<RoomDetail />} />
-              <Route path="/servicios" element={<PublicServices />} />
-            </Routes>
+    <Container className="app p-0" fluid={true} style={{ backgroundColor: '#f8f9fa' }}>	
+,>
+      <AuthProvider>
+        <Router>
+          <div className="d-flex flex-column min-vh-100">
+            <BarraNav />
+            <div className="flex-grow-1">
+              <ToastContainer />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/admin/*" element={<Admin />} />
+                <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
+                <Route path="/habitaciones" element={<PublicRooms />} />
+                <Route path="/habitaciones/:roomId" element={<RoomDetail />} />
+                <Route path="/servicios" element={<PublicServices />} />
+              </Routes>
+            </div>
+            <Footer />
           </div>
-          <Footer />
-        </div>
-      </Router>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </Container>
   );
 }
 

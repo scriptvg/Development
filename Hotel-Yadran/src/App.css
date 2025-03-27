@@ -41,3 +41,11 @@
   color: #888;
 }
  */
+
+ .apps {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
