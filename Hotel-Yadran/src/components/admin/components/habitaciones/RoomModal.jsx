@@ -188,15 +188,15 @@ const RoomModal = ({ show, handleClose, handleSaveRoom: externalHandleSaveRoom }
             className="room-modal"
             size="lg"
         >
-            <Modal.Header closeButton>
+            <Modal.Header closeButton className="bg-primary text-white">
                 <Modal.Title className="d-flex align-items-center gap-2">
-                    <Bed className="text-primary" size={28} />
+                    <Bed className="text-light" size={28} />
                     <span className="h4 mb-0">
                         Nueva Habitación
                     </span>
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body className="py-4 bg-white">
+            <Modal.Body className="py-4 bg-light">
                 <Form className="form-section form-section-left">
                     <div className="row g-4">
                         <div className="col-12 mb-4">

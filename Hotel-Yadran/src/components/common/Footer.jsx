@@ -49,12 +49,19 @@ const Footer = () => {
                             <h4 className="mb-4">Contáctanos</h4>
                             <div className="contact-item">
                                 <MapPin size={18} className="contact-icon" />
-                                <span>Av. Costanera #1234, Punta Arenas, Chile</span>
+                                <span>
+                                P.º de los Turistas, Provincia de Puntarenas, Puntarenas, Carmen</span>
                             </div>
                             <div className="contact-item">
                                 <Phone size={18} className="contact-icon" />
-                                <span>+56 9 1234 5678</span>
+                                <span>+(506) 2661-2662</span>
                             </div>
+
+                            <div className="contact-item">
+                                <Phone size={18} className="contact-icon" />
+                                <span>+(506) 2661-2662</span>
+                            </div>
+
                             <div className="contact-item">
                                 <Mail size={18} className="contact-icon" />
                                 <span>info@hotelyadran.cl</span>

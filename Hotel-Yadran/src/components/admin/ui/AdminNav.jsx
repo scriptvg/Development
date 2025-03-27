@@ -17,9 +17,7 @@ function AdminNav() {
     const location = useLocation();
     const { logout } = useAuth();
     
-    const isActive = (path) => {
-        return location.pathname.startsWith(`/admin${path}`) ? 'active' : '';
-    };
+    const isActive = (path) => location.pathname.startsWith(`/admin${path}`) ? 'active' : '';
 
     return (
         <div className="admin-sidebar">

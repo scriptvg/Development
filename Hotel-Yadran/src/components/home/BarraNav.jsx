@@ -3,23 +3,13 @@ import { Navbar, Nav, Image, Button, Offcanvas } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../config/context/auth/useAuth';
 import logo from '../../assets/img/logo.jpg';
-import "./styles/nav.css";
-import { User, Settings, Users, Hotel, MessageSquare, Home, Menu, X } from "lucide-react";
-import { FaGoogle } from "react-icons/fa";
-import { SideBar } from './ui/SideBar.jsx';
+import './styles/nav.css';
+import { User, Settings, Users, Hotel, MessageSquare, Home, Menu, X } from 'lucide-react';
+import { FaGoogle } from 'react-icons/fa';
+import { SideBar } from '../home/ui/SideBar';
 
 function BarraNav() {
-    // Get router hooks safely with conditional usage
-    let navigate;
-    try {
-        navigate = useNavigate();
-    } catch (error) {
-        // Handle the case when not in router context
-        navigate = (path) => {
-            window.location.href = path;
-        };
-    }
-    
+    const navigate = useNavigate();
     const { user, logout } = useAuth();
     const [showAdminSidebar, setShowAdminSidebar] = useState(false);
     const [showCrudSidebar, setShowCrudSidebar] = useState(false);
@@ -43,10 +33,7 @@ function BarraNav() {
         { icon: <MessageSquare size={20} />, label: 'Gestionar Testimonios', path: '/admin/testimonials' },
     ];
 
-    // Function to handle navigation
-    const handleNavigation = (path) => {
-        navigate(path);
-    };
+    const handleNavigation = (path) => navigate(path);
 
     return (
         <>
@@ -55,7 +42,6 @@ function BarraNav() {
                     <Navbar.Brand onClick={() => handleNavigation('/')} className="brand-hover">
                         <Image src={logo} className="brand-logo" width="40" height="40" alt="Logo de Hotel Yadran" />
                     </Navbar.Brand>
-
                     <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto nav-links">
@@ -69,23 +55,29 @@ function BarraNav() {
                                 </Nav.Link>
                             ))}
                         </Nav>
-
                         <div className="nav-divider mx-4"></div>
-
                         <Nav className="auth-section">
                             {!user ? (
                                 <div className="d-flex gap-3">
-                                    <Button className="auth-btn register-btn" variant="outline-primary" onClick={() => handleNavigation('/register')}>
+                                    <Button 
+                                        className="auth-btn register-btn" 
+                                        variant="outline-primary" 
+                                        onClick={() => handleNavigation('/register')}
+                                    >
                                         Registrarse
                                     </Button>
-                                    <Button className="auth-btn login-btn" variant="primary" onClick={() => handleNavigation('/login')}>
+                                    <Button 
+                                        className="auth-btn login-btn" 
+                                        variant="primary" 
+                                        onClick={() => handleNavigation('/login')}
+                                    >
                                         Iniciar Sesión
                                     </Button>
                                 </div>
                             ) : (
                                 <div className="d-flex align-items-center gap-3">
                                     <div className="welcome-container">
-                                        <span className="welcome-name">¡Hola, {user.nombre} {user.rol}!</span>
+                                        <span className="welcome-name">¡Hola, {user.nombre}!</span>
                                         <div className="user-type">
                                             {user.authProvider === 'google' ? (
                                                 <FaGoogle className="provider-icon google" />
@@ -97,7 +89,6 @@ function BarraNav() {
                                             </span>
                                         </div>
                                     </div>
-                                    
                                     {isAdminUser && (
                                         <Button 
                                             className="admin-menu-btn"
@@ -108,11 +99,11 @@ function BarraNav() {
                                         </Button>
                                     )}
                                     <Button
-                                      className="crud-menu-btn ms-2"
-                                      variant="outline-primary"
-                                      onClick={() => setShowCrudSidebar(true)}
+                                        className="crud-menu-btn ms-2"
+                                        variant="outline-primary"
+                                        onClick={() => setShowCrudSidebar(true)}
                                     >
-                                      <Menu size={20} />
+                                        <Menu size={20} />
                                     </Button>
                                     <Button 
                                         className="logout-btn" 
@@ -128,7 +119,6 @@ function BarraNav() {
                 </Navbar>
             </div>
 
-            {/* Admin Sidebar */}
             {isAdminUser && (
                 <Offcanvas 
                     show={showAdminSidebar} 
@@ -169,8 +159,8 @@ function BarraNav() {
                 </Offcanvas>
             )}
             <SideBar 
-              show={showCrudSidebar} 
-              handleClose={() => setShowCrudSidebar(false)}
+                show={showCrudSidebar} 
+                handleClose={() => setShowCrudSidebar(false)}
             />
         </>
     );
