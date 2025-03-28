@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, InputGroup, Button, Alert, Spinner } from 'react-bootstrap';
-import { Eye, EyeClosed, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import Swal from 'sweetalert2';
 import usersCalls from '../../config/services/usersCalls';
+import { useAuth } from '../../config/context/auth/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 function RegisterForm() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",
@@ -95,14 +99,28 @@ function RegisterForm() {
 
     try {
       setCargando(true);
-      // Subir la imagen de perfil
-      if (formData.profileImageBase64) {
-        await usersCalls.PostUsers({
-          ...formData,
-          profileImage: formData.profileImageBase64
-        });
-      }
-      await usersCalls.PostUsers(formData.nombre, formData.email, formData.password);
+
+      // Call PostUsers with all required parameters including the profile image
+      const userData = await usersCalls.PostUsers(
+        formData.nombre,
+        "",                      // apellido (empty as not collected in form)
+        formData.email,
+        formData.password,       // Using password field for contraseña
+        "usuario",               // rol - default to regular user
+        "",                      // telefono (empty as not collected in form)
+        "",                      // direccion (empty as not collected in form)
+        formData.profileImageBase64  // Sending the base64 string of the image
+      );
+
+      // Add the profile image to the user data
+      const completeUserData = {
+        ...userData,
+        ImgPerfil: formData.profileImageBase64
+      };
+      
+      // Log in the user using the auth context
+      login(completeUserData);
+
       await mostrarAlerta("success", "¡Registro exitoso!", "Usuario registrado exitosamente");
       setMensaje("¡Registro exitoso!");
       setFormData({
@@ -111,8 +129,13 @@ function RegisterForm() {
         password: "",
         passwordConfirm: "",
         profileImage: null,
-        profileImageBase64: null
+        profileImageBase64: null  // Also reset the base64 string
       });
+
+      // Redirigir al usuario a la página principal después del registro
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
     } catch (error) {
       await mostrarAlerta("error", "Error", "Ocurrió un error al registrar el usuario");
       console.error("Error al registrar el usuario:", error);
@@ -189,10 +212,9 @@ function RegisterForm() {
                   placeholder='Confirme su contraseña'/>
                 <Button variant='outline-secondary'
                   onClick={altShowConfirmPass}
-                  disabled={Cargando}>
-                  {showConfirmPassword ? <EyeOff /> : <Eye />}
-                </Button>
-                <Form.Control.Feedback type='invalid'>{errors.passwordConfirm}</Form.Control.Feedback>
+                    disabled={Cargando}>
+                    {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  </Button>
               </InputGroup>
             </Form.Group>
 
@@ -200,34 +222,46 @@ function RegisterForm() {
               <Form.Label>Imagen de Perfil</Form.Label>
               <Form.Control
                 type="file"
+                accept="image/*"
                 onChange={(e) => {
-                  manejarInput("profileImage", e.target.files[0]);
-                  // Convertir la imagen a Base64
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    setFormData(prev => ({
-                      ...prev, profileImageBase64: reader.result
-                    }));
-                  };
-                  reader.readAsDataURL(e.target.files[0]);
+                  if (e.target.files && e.target.files[0]) {
+                    manejarInput("profileImage", e.target.files[0]);
+                    // Convertir la imagen a Base64
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      setFormData(prev => ({
+                        ...prev, profileImageBase64: reader.result
+                      }));
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                  }
                 }}
                 isInvalid={!!errors.profileImage}
               />
               <Form.Control.Feedback type='invalid'>{errors.profileImage}</Form.Control.Feedback>
+              {formData.profileImage && (
+                <div className="mt-2">
+                  <small className="text-success">
+                    Imagen seleccionada: {formData.profileImage.name}
+                  </small>
+                </div>
+              )}
             </Form.Group>
 
-            <Button 
-              variant="primary" 
-              className="w-100 mt-4" 
-              onClick={register} 
-              disabled={Cargando}>
-              {Cargando ? (
-                <>
-                  <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                  <span className="ms-2">Cargando...</span>
-                </>
-              ) : "Registrar"}
-            </Button>
+            <Form.Group>
+              <Button 
+                variant="primary" 
+                className="w-100 mt-4" 
+                onClick={register} 
+                disabled={Cargando}>
+                {Cargando ? (
+                  <>
+                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                    <span className="ms-2">Cargando...</span>
+                  </>
+                ) : "Registrar"}
+              </Button>
+            </Form.Group>
           </Form>
         </Card.Body>
       </Card>

@@ -11,23 +11,27 @@ import Footer from './components/common/Footer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './config/context/auth/useAuth';
+import Register from './pages/auth/Register';
+import Test from './pages/test/TestPage';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="d-flex flex-column min-vh-100">
-          <BarraNav />
+          {/* <BarraNav /> */}
           <div className="flex-grow-1">
             <ToastContainer />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               <Route path="/admin/*" element={<Admin />} />
               <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
               <Route path="/habitaciones" element={<PublicRooms />} />
               <Route path="/habitaciones/:roomId" element={<RoomDetail />} />
               <Route path="/servicios" element={<PublicServices />} />
+              <Route path="/test" element={<Test />} />
             </Routes>
           </div>
           <Footer />

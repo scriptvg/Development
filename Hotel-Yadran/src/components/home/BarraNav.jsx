@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Navbar, Nav, Image, Button, Offcanvas } from 'react-bootstrap';
+import { Navbar, Nav, Image, Button, Offcanvas, Dropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../config/context/auth/useAuth';
 import logo from '../../assets/img/logo.jpg';
 import './styles/nav.css';
-import { User, Settings, Users, Hotel, MessageSquare, Home, Menu, X } from 'lucide-react';
+import { User, Settings, Users, Hotel, MessageSquare, Home, Menu, X, LogOut, UserCircle } from 'lucide-react';
 import { FaGoogle } from 'react-icons/fa';
 import { SideBar } from '../home/ui/SideBar';
 
@@ -76,19 +76,66 @@ function BarraNav() {
                                 </div>
                             ) : (
                                 <div className="d-flex align-items-center gap-3">
-                                    <div className="welcome-container">
-                                        <span className="welcome-name">¡Hola, {user.nombre}!</span>
-                                        <div className="user-type">
-                                            {user.authProvider === 'google' ? (
-                                                <FaGoogle className="provider-icon google" />
-                                            ) : (
-                                                <User className="provider-icon local" />
-                                            )}
-                                            <span className="user-type-text">
-                                                {user.authProvider === 'google' ? 'Google Admin' : 'Usuario Local'}
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <Dropdown align="end">
+                                        <Dropdown.Toggle variant="light" id="dropdown-user" className="user-dropdown-toggle d-flex align-items-center gap-2">
+                                            <div className="avatar-container">
+                                                {user.ImgPerfil ? (
+                                                    <Image 
+                                                        src={user.ImgPerfil} 
+                                                        roundedCircle 
+                                                        width={30} 
+                                                        height={30} 
+                                                        className="me-1 object-fit-cover"
+                                                        alt="Profile" 
+                                                    />
+                                                ) : user.authProvider === 'google' ? (
+                                                    <FaGoogle className="avatar-icon" />
+                                                ) : (
+                                                    <UserCircle size={24} className="avatar-icon" />
+                                                )}
+                                            </div>
+                                            <span className="d-none d-md-inline">{user.nombre}</span>
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu className="user-dropdown-menu">
+                                            <div className="px-3 py-2 border-bottom d-flex align-items-center gap-2">
+                                                {user.ImgPerfil ? (
+                                                    <Image 
+                                                        src={user.ImgPerfil} 
+                                                        roundedCircle 
+                                                        width={40} 
+                                                        height={40} 
+                                                        className="object-fit-cover"
+                                                        alt="Profile" 
+                                                    />
+                                                ) : (
+                                                    <UserCircle size={40} />
+                                                )}
+                                                <div>
+                                                    <p className="mb-0 fw-bold">{user.nombre}</p>
+                                                    <small className="text-muted">{user.email}</small>
+                                                </div>
+                                            </div>
+                                            <Dropdown.Item onClick={() => handleNavigation('/perfil')} className="d-flex align-items-center gap-2">
+                                                <User size={16} />
+                                                <span>Mi Perfil</span>
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handleNavigation('/reservas')} className="d-flex align-items-center gap-2">
+                                                <Hotel size={16} />
+                                                <span>Mis Reservas</span>
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handleNavigation('/configuracion')} className="d-flex align-items-center gap-2">
+                                                <Settings size={16} />
+                                                <span>Configuración</span>
+                                            </Dropdown.Item>
+                                            <Dropdown.Divider />
+                                            <Dropdown.Item onClick={cerrarSesion} className="text-danger d-flex align-items-center gap-2">
+                                                <LogOut size={16} />
+                                                <span>Cerrar Sesión</span>
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+
                                     {isAdminUser && (
                                         <Button 
                                             className="admin-menu-btn"
@@ -104,13 +151,6 @@ function BarraNav() {
                                         onClick={() => setShowCrudSidebar(true)}
                                     >
                                         <Menu size={20} />
-                                    </Button>
-                                    <Button 
-                                        className="logout-btn" 
-                                        variant="outline-danger" 
-                                        onClick={cerrarSesion}
-                                    >
-                                        Salir
                                     </Button>
                                 </div>
                             )}

@@ -20,9 +20,18 @@ async function GetUsers() {
     }
 }
 
-async function PostUsers(nombre, apellido, email, contraseña, rol, telefono, direccion) {
+async function PostUsers(nombre, apellido, email, contraseña, rol, telefono, direccion, ImgPerfil) {
     try {
-        const userData = { nombre, apellido, email, contraseña, rol, telefono, direccion };
+        const userData = { 
+            nombre, 
+            apellido, 
+            email, 
+            contraseña, 
+            rol, 
+            telefono, 
+            direccion,
+            ImgPerfil // Add the profile image to userData
+        };
 
         const response = await fetch(`${BASE_URL}`, {
             method: 'POST',
