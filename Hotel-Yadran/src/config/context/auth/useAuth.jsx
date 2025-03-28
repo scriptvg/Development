@@ -40,26 +40,37 @@ export const AuthProvider = ({ children }) => {
     console.log('Login context - Received user:', user);
     const login = (authUser) => {
         console.log('Setting user in context:', authUser);
-        
-        // Determine the profile image source with priority order
-        const profileImage = 
-            authUser.ImgPerfil || 
-            authUser.profileImageBase64 || 
-            authUser.photoUrl || 
-            authUser.user_metadata?.avatar_url || 
+
+        // Adaptación para la nueva estructura:
+        // 1. Determinar la imagen de perfil según la estructura anidada
+        const profileImage =
+            authUser.img?.imgPerfil ||
+            authUser.ImgPerfil ||
+            authUser.photoUrl ||
+            authUser.user_metadata?.avatar_url ||
             null;
-        
+
+        // 2. Crear estructura de usuario usando el nuevo formato
         const userData = {
             id: authUser.id,
-            nombre: authUser.nombre || authUser.user_metadata?.name,
             email: authUser.email,
-            rol: authUser.rol || 'user',
-            roles: [authUser.rol === 'admin' ? 'admin' : 'user'],
-            authProvider: authUser.authProvider,
-            photoUrl: authUser.photoUrl,
-            ImgPerfil: profileImage // Store the profile image in the user object
+            password: authUser.password, // Solo para propósitos de desarrollo
+            rol: authUser.rol || 'usuario',
+            roles: [authUser.rol || 'usuario'], // Mantener compatibilidad con sistema anterior
+            loginType: authUser.loginType || 'local',
+            img: {
+                imgPerfil: profileImage
+            },
+            datos: {
+                nombre: authUser.datos?.nombre || authUser.nombre || authUser.user_metadata?.name || '',
+                telefono: authUser.datos?.telefono || authUser.telefono || '',
+                direccion: authUser.datos?.direccion || authUser.direccion || ''
+            },
+            // Mantener propiedades planas para compatibilidad
+            nombre: authUser.datos?.nombre || authUser.nombre || authUser.user_metadata?.name || '',
+            ImgPerfil: profileImage
         };
-        
+
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
         console.log('User stored in localStorage with profile image:', userData);
@@ -68,12 +79,17 @@ export const AuthProvider = ({ children }) => {
     /* Actualizar imagen de perfil */
     const updateProfileImage = (imageData) => {
         if (!user) return;
-        
+
+        // Actualizar usando la nueva estructura anidada
         const updatedUser = {
             ...user,
-            ImgPerfil: imageData
+            img: {
+                ...user.img,
+                imgPerfil: imageData
+            },
+            ImgPerfil: imageData // Mantener también la propiedad plana para compatibilidad
         };
-        
+
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
         console.log('Profile image updated in context and localStorage');
@@ -87,7 +103,7 @@ export const AuthProvider = ({ children }) => {
             if (user) {
                 await supabase.auth.signOut();
             }
-            
+
             // Clear local auth state
             setUser(null);
             localStorage.removeItem('user');

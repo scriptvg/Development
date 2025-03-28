@@ -28,18 +28,18 @@ function LoginForm() {
     const { login, loading: authLoading } = useAuth();
 
     /* Datos */
-    const [formData, setFormData] = useState({
+    const [datosFormulario, setDatosFormulario] = useState({
         correo: "",
         contraseña: ""
     });
     const [mensaje, setMensaje] = useState("");
-    const [errors, setErrors] = useState({});
-    const [Cargando, setCargando] = useState(false);
-    const [showPass, setShowPass] = useState(false);
+    const [errores, setErrores] = useState({});
+    const [cargando, setCargando] = useState(false);
+    const [mostrarContraseña, setMostrarContraseña] = useState(false);
     const [usuarios, setUsuarios] = useState([]);
 
     useEffect(() => {
-        loadDataUser();
+        cargarDatosUsuario();
     }, []);
 
     /* Alerta */
@@ -53,50 +53,55 @@ function LoginForm() {
             showConfirmButton: false,
             timer: 1500,
             timerProgressBar: true
-        }).fire(); 
+        }).fire();
     };
 
     /* Cargar datos */
-    const loadDataUser = async () => {
+    const cargarDatosUsuario = async () => {
         try {
             setCargando(true);
-            const data = await usersCalls.GetUsers();
-            setUsuarios(data);
+            const datos = await usersCalls.GetUsers();
+            setUsuarios(datos);
         } catch (error) {
             await mostrarAlerta("error", "Error", "Ocurrió un error al cargar los datos");
         } finally {
             setCargando(false);
         };
     };
-    
+
     /* Manejar inicio de sesión */
-    const manejarLogin = async () => {
-        if (!validarForm()) return;
-        
+    const iniciarSesion = async () => {
+        if (!validarFormulario()) return;
+
         try {
             setCargando(true);
-            
-            // Buscar usuario por correo y contraseña
+
+            // Buscar usuario por correo y contraseña usando la nueva estructura
             const usuarioEncontrado = usuarios.find(
-                (user) => user.email === formData.correo && (user.contraseña === formData.contraseña || user.password === formData.contraseña)
+                (usuario) => usuario.email === datosFormulario.correo &&
+                    (usuario.password === datosFormulario.contraseña)
             );
 
-            // Validate role existence
-            
             if (usuarioEncontrado) {
-                // Add role assignment for demo admin
-                // Add role based on backend 'rol' property
-                usuarioEncontrado.roles = [usuarioEncontrado.rol || usuarioEncontrado.role || 'user'];
-                
-                // Special case for admin demo user
-                if (usuarioEncontrado.email === 'admin@hotelyadran.com') {
-                    usuarioEncontrado.roles = ['admin'];
-                }
-                login(usuarioEncontrado);
+                // Adaptar la estructura de roles según la nueva estructura
+                const rolUsuario = usuarioEncontrado.rol || 'usuario';
+
+                // Crear objeto de usuario con la nueva estructura
+                const datosUsuarioCompletos = {
+                    ...usuarioEncontrado,
+                    roles: [rolUsuario], // Mantener compatibilidad con el sistema de roles existente
+                    // Asegurar que los datos estén disponibles en el formato esperado por la aplicación
+                    nombre: usuarioEncontrado.datos?.nombre || '',
+                    telefono: usuarioEncontrado.datos?.telefono || '',
+                    direccion: usuarioEncontrado.datos?.direccion || '',
+                    ImgPerfil: usuarioEncontrado.img?.imgPerfil || null
+                };
+
+                login(datosUsuarioCompletos);
                 await mostrarAlerta("success", "¡Bienvenido!", "Inicio de sesión exitoso");
-                
+
                 // Redireccionar según el rol del usuario
-                if (usuarioEncontrado.roles?.includes('admin')) {
+                if (rolUsuario === 'admin') {
                     navigate("/dashboard");
                 } else {
                     navigate("/");
@@ -113,134 +118,134 @@ function LoginForm() {
     };
 
     /* Validar */
-    const validarForm = () => {
-        const errores = {};
+    const validarFormulario = () => {
+        const erroresValidacion = {};
         let esValido = true;
 
-        if (!formData.correo) {
-            errores.correo = "El correo es obligatorio";
+        if (!datosFormulario.correo) {
+            erroresValidacion.correo = "El correo es obligatorio";
             esValido = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo)) {
-            errores.correo = "El correo electrónico no es válido";
-            esValido = false;    
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datosFormulario.correo)) {
+            erroresValidacion.correo = "El correo electrónico no es válido";
+            esValido = false;
         }
 
-        if (!formData.contraseña) {
-            errores.contraseña = "La contraseña es obligatoria";
-            esValido = false; 
+        if (!datosFormulario.contraseña) {
+            erroresValidacion.contraseña = "La contraseña es obligatoria";
+            esValido = false;
         }
 
-        setErrors(errores);
+        setErrores(erroresValidacion);
         return esValido;
     };
 
     /* Manejar eventos */
     const manejarInput = (campo, valor) => {
-        setFormData(prev => ({
+        setDatosFormulario(prev => ({
             ...prev, [campo]: valor
         }));
-        if (errors[campo]) {
-            setErrors(prev => ({
+        if (errores[campo]) {
+            setErrores(prev => ({
                 ...prev, [campo]: null
             }));
         }
     };
 
-    const altShowPass = () => {
-        setShowPass(!showPass);
+    const alternarContraseña = () => {
+        setMostrarContraseña(!mostrarContraseña);
     };
 
-    
 
 
-  if (authLoading) {
-    return <div className="text-center mt-5"><Spinner animation="border" variant="primary" /></div>;
-}
 
-return (
-    <Container className='login-container'>
-        <Card className='formLogin shadow' >
-            <Card.Header>
-                <Card.Img className="img" src={logo} />
-                <Card.Title className='text-center'>Iniciar Sesión</Card.Title>
-            </Card.Header>
+    if (authLoading) {
+        return <div className="text-center mt-5"><Spinner animation="border" variant="primary" /></div>;
+    }
 
-            {mensaje && <Alert variant="success">{mensaje}</Alert>}
+    return (
+        <Container className='login-container'>
+            <Card className='formLogin shadow' >
+                <Card.Header>
+                    <Card.Img className="img" src={logo} />
+                    <Card.Title className='text-center'>Iniciar Sesión</Card.Title>
+                </Card.Header>
 
-            <Card.Body>
-               <Form>
+                {mensaje && <Alert variant="success">{mensaje}</Alert>}
 
-               <Form.Group>
-                    <Form.Label>Correo Electrónico</Form.Label>
-                    <InputGroup>
-                        <Form.Control
-                        value={formData.correo}
-                        onChange={(e) => manejarInput("correo", e.target.value)}
-                        isInvalid={!!errors.correo}
-                        placeholder='Ingrese su correo electrónico'/>
-                        <Form.Control.Feedback type='invalid'>{errors.correo}</Form.Control.Feedback>
-                    </InputGroup>
-                </Form.Group>
+                <Card.Body>
+                    <Form>
 
-                <Form.Group className='mt-3'>
-                    <Form.Label>Contraseña</Form.Label>
-                    <InputGroup>
-                        <Form.Control
-                        id='contrasena'
-                        disabled={Cargando}
-                        type={showPass ? "text" : "password"}
-                        value={formData.contraseña}
-                        onChange={(e) => manejarInput("contraseña", e.target.value)}
-                        isInvalid={!!errors.contraseña}
-                        placeholder='Ingrese su contraseña'/>
-                       <Button variant='outline-secondary'
-                       onClick={altShowPass}
-                       disabled={Cargando}>
-                            {showPass ? <EyeOff /> : <Eye />}
-                       </Button>
-                       <Form.Control.Feedback type='invalid'>{errors.contraseña}</Form.Control.Feedback>
-                    </InputGroup>
-                </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Correo Electrónico</Form.Label>
+                            <InputGroup>
+                                <Form.Control
+                                    value={datosFormulario.correo}
+                                    onChange={(e) => manejarInput("correo", e.target.value)}
+                                    isInvalid={!!errores.correo}
+                                    placeholder='Ingrese su correo electrónico' />
+                                <Form.Control.Feedback type='invalid'>{errores.correo}</Form.Control.Feedback>
+                            </InputGroup>
+                        </Form.Group>
 
-                
-                <Button 
-                    variant="primary" 
-                    className="w-100 mt-4" 
-                    onClick={manejarLogin} 
-                    disabled={Cargando}>
-                    {Cargando ? (
-                        <>
-                            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                            <span className="ms-2">Cargando...</span>
-                        </>
-                    ) : "Iniciar Sesión"}
-                </Button>
-                <Container className="text-muted small mt-1 mb-1"><FaUser className="me-1" />Autenticación Local</Container>
-                
-                
-                <div className="mt-3">
-                    <BtnLoginGoogle />
-                    <div className="text-muted small mt-1"><FaGoogle className="me-1" />Autenticación Google</div>
-                </div>
+                        <Form.Group className='mt-3'>
+                            <Form.Label>Contraseña</Form.Label>
+                            <InputGroup>
+                                <Form.Control
+                                    id='contrasena'
+                                    disabled={cargando}
+                                    type={mostrarContraseña ? "text" : "password"}
+                                    value={datosFormulario.contraseña}
+                                    onChange={(e) => manejarInput("contraseña", e.target.value)}
+                                    isInvalid={!!errores.contraseña}
+                                    placeholder='Ingrese su contraseña' />
+                                <Button variant='outline-secondary'
+                                    onClick={alternarContraseña}
+                                    disabled={cargando}>
+                                    {mostrarContraseña ? <EyeOff /> : <Eye />}
+                                </Button>
+                                <Form.Control.Feedback type='invalid'>{errores.contraseña}</Form.Control.Feedback>
+                            </InputGroup>
+                        </Form.Group>
 
-               </Form>
 
-            </Card.Body>
+                        <Button
+                            variant="primary"
+                            className="w-100 mt-4"
+                            onClick={iniciarSesion}
+                            disabled={cargando}>
+                            {cargando ? (
+                                <>
+                                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                                    <span className="ms-2">Cargando...</span>
+                                </>
+                            ) : "Iniciar Sesión"}
+                        </Button>
+                        <Container className="text-muted small mt-1 mb-1"><FaUser className="me-1" />Autenticación Local</Container>
 
-            <Card.Footer>
-            <Card.Title className='mt-3 display-1'>Usuarios de la Demo:</Card.Title>
-            <Card.Text>
-                Admin Local: <br />
-                Email: admin@hotelyadran.com <br />
-                Password: admin123
-            </Card.Text>
-        </Card.Footer>
 
-        </Card>
+                        <div className="mt-3">
+                            <BtnLoginGoogle />
+                            <div className="text-muted small mt-1"><FaGoogle className="me-1" />Autenticación Google</div>
+                        </div>
 
-        
-    </Container>
-  )
+                    </Form>
+
+                </Card.Body>
+
+                <Card.Footer>
+                    <Card.Title className='mt-3 display-1'>Usuarios de la Demo:</Card.Title>
+                    <Card.Text>
+                        Admin Local: <br />
+                        Email: admin@hotelyadran.com <br />
+                        Password: admin123
+                    </Card.Text>
+                </Card.Footer>
+
+            </Card>
+
+
+        </Container>
+    )
 }
 
 export default LoginForm

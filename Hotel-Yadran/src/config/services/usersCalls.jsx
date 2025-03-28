@@ -20,17 +20,16 @@ async function GetUsers() {
     }
 }
 
-async function PostUsers(nombre, apellido, email, contraseña, rol, telefono, direccion, ImgPerfil) {
+// Actualizada para la nueva estructura
+async function PostUsers(email, password, rol, img, datos) {
     try {
-        const userData = { 
-            nombre, 
-            apellido, 
-            email, 
-            contraseña, 
-            rol, 
-            telefono, 
-            direccion,
-            ImgPerfil // Add the profile image to userData
+        // Nueva estructura del usuario
+        const userData = {
+            email,
+            password,
+            rol,
+            img,
+            datos
         };
 
         const response = await fetch(`${BASE_URL}`, {
@@ -52,9 +51,18 @@ async function PostUsers(nombre, apellido, email, contraseña, rol, telefono, di
     }
 }
 
-async function UpdateUsers(nombre, apellido, email, contraseña, rol, telefono, direccion, id) {
+// Actualizado para usar la nueva estructura
+async function UpdateUsers(id, email, password, rol, img, datos) {
     try {
-        const userData = { nombre, apellido, email, contraseña, rol, telefono, direccion, id };
+        // Nueva estructura del usuario para actualización
+        const userData = {
+            id,
+            email,
+            password,
+            rol,
+            img,
+            datos
+        };
 
         const response = await fetch(`${BASE_URL}/${id}`, {
             method: 'PUT',

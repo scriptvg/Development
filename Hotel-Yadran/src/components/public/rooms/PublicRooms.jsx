@@ -7,6 +7,7 @@ import ServiceBadge from '../../admin/components/common/ServiceBadge.jsx';
 import { ESTADOS } from '../../admin/utils/estadosConfig.jsx';
 import { expandirServicios } from '../../admin/utils/ServicesConfig.jsx';
 import './publicRooms.css';
+import BarraNav from '../../home/BarraNav.jsx';
 
 const PublicRooms = () => {
     const navigate = useNavigate();
@@ -107,6 +108,8 @@ const PublicRooms = () => {
     };
 
     return (
+        <>
+        <BarraNav/>
         <div className="public-rooms-page">
             {/* Hero Section with Visual Hierarchy */}
             <div className="rooms-hero">
@@ -330,6 +333,7 @@ const PublicRooms = () => {
                 )}
             </Container>
         </div>
+        </>
     );
 };
 

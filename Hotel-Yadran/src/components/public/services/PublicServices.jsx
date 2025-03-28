@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Badge, Alert, Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { Container, Button, Row, Col, Card, Badge, Alert, Spinner } from 'react-bootstrap';
 import { MapPin, Star, Info, Wifi, Coffee, ShowerHead, Tv, Car } from 'lucide-react';
 import servicesDataService from '../../admin/components/servicios/services/servicesDataService.jsx';
 import { LISTA_SERVICIOS } from '../../admin/utils/ServicesConfig.jsx';
 import './publicServices.css';
+import BarraNav from '../../home/BarraNav.jsx';
 
 const PublicServices = () => {
     const [services, setServices] = useState([]);
     const [featuredServices, setFeaturedServices] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    
+    const navigate = useNavigate();
+
     // Load services
     useEffect(() => {
         const fetchServices = async () => {
             setIsLoading(true);
             setError(null);
-            
+
             try {
                 // Use a simpler approach with direct data loading
                 servicesDataService.getAllServices(
@@ -38,10 +41,10 @@ const PublicServices = () => {
                 setIsLoading(false);
             }
         };
-        
+
         fetchServices();
     }, []);
-    
+
     // Group services by categories (using variant as category)
     const groupedServices = services.reduce((groups, service) => {
         const variant = service.variante || 'primary';
@@ -51,7 +54,7 @@ const PublicServices = () => {
         groups[variant].push(service);
         return groups;
     }, {});
-    
+
     // Get category label
     const getCategoryLabel = (variant) => {
         switch (variant) {
@@ -65,18 +68,18 @@ const PublicServices = () => {
             default: return 'Otros Servicios';
         }
     };
-    
+
     if (isLoading) {
         return (
-            <div className="py-5 text-center">
-                <div className="spinner-border text-primary" role="status">
+            <Container className="py-5 text-center">
+                <Container className="spinner-border text-primary" role="status">
                     <span className="visually-hidden">Cargando...</span>
-                </div>
+                </Container>
                 <p className="mt-3 text-muted">Cargando servicios...</p>
-            </div>
+            </Container>
         );
     }
-    
+
     if (error) {
         return (
             <Container className="py-5">
@@ -87,11 +90,13 @@ const PublicServices = () => {
             </Container>
         );
     }
-    
+
     return (
-        <div className="public-services-page">
+        <>
+        <BarraNav/>
+        <Container className="public-services-page">
             {/* Hero Section */}
-            <div className="services-hero">
+            <Container lg={20} className="services-hero">
                 <Container>
                     <Row className="justify-content-center">
                         <Col lg={8} className="text-center">
@@ -103,22 +108,22 @@ const PublicServices = () => {
                             <p className="lead text-white-50 mb-4">
                                 Descubre todos los servicios y comodidades que tenemos para ofrecerte durante tu estadía
                             </p>
-                            <div className="d-flex justify-content-center">
-                                <div className="rating-display">
+                            <Container className="d-flex justify-content-center">
+                                <Container className="rating-display">
                                     {[...Array(5)].map((_, i) => (
                                         <Star key={i} size={20} className="text-warning" />
                                     ))}
                                     <span className="ms-2 rating-text">Calificado con 5 estrellas</span>
-                                </div>
-                            </div>
+                                </Container>
+                            </Container>
                         </Col>
                     </Row>
                 </Container>
-            </div>
+            </Container>
 
             <Container className="py-5">
                 {/* Featured Services */}
-                <section className="mb-5">
+                <Container className="mb-5">
                     <h2 className="section-title text-center mb-4">Servicios Destacados</h2>
                     <Row className="g-4">
                         {featuredServices.map((service, index) => (
@@ -126,8 +131,8 @@ const PublicServices = () => {
                                 <Card className="featured-service-card h-100 border-0 shadow-sm">
                                     <Card.Body className="p-4 text-center">
                                         <div className="featured-service-icon mx-auto mb-3">
-                                            {service.icono && React.isValidElement(service.icono) 
-                                                ? React.cloneElement(service.icono, { size: 32 }) 
+                                            {service.icono && React.isValidElement(service.icono)
+                                                ? React.cloneElement(service.icono, { size: 32 })
                                                 : <Info size={32} />
                                             }
                                         </div>
@@ -138,12 +143,12 @@ const PublicServices = () => {
                             </Col>
                         ))}
                     </Row>
-                </section>
-                
+                </Container>
+
                 {/* All Services By Category */}
-                <section>
+                <Container className="py-5">
                     <h2 className="section-title text-center mb-5">Todos Nuestros Servicios</h2>
-                    
+
                     {Object.keys(groupedServices).map((variant) => (
                         <div key={variant} className="service-category mb-5">
                             <h3 className={`category-title text-${variant} mb-4`}>
@@ -156,8 +161,8 @@ const PublicServices = () => {
                                             <Card.Body className="p-3">
                                                 <div className="d-flex align-items-center mb-3">
                                                     <div className={`service-item-icon bg-${variant} bg-opacity-10 me-3`}>
-                                                        {service.icono && React.isValidElement(service.icono) 
-                                                            ? React.cloneElement(service.icono, { size: 24 }) 
+                                                        {service.icono && React.isValidElement(service.icono)
+                                                            ? React.cloneElement(service.icono, { size: 24 })
                                                             : <Info size={24} />
                                                         }
                                                     </div>
@@ -171,26 +176,43 @@ const PublicServices = () => {
                             </Row>
                         </div>
                     ))}
-                </section>
+                </Container>
             </Container>
-            
-            {/* Call to Action */}
-            <section className="cta-section py-5 text-white text-center">
+
+            <Container className="py-5 text-center bg-primary text-white rounded-3 ">
                 <Container>
-                    <Row className="justify-content-center">
-                        <Col lg={8}>
+                    <Row>
+                        <Col lg={8} className="mx-auto">
                             <h2 className="mb-4">¿Listo para disfrutar de estos servicios?</h2>
                             <p className="lead mb-4">
                                 Reserva ahora y disfruta de todos nuestros servicios premium durante tu estadía
                             </p>
-                            <a href="/habitaciones" className="btn btn-light btn-lg px-5 py-3 rounded-pill">
+                            <Button onClick={() => navigate("/habitaciones")} className="btn btn-light btn-lg px-5 py-3 rounded-pill bg-white ">
                                 Ver Habitaciones
-                            </a>
+                            </Button>
                         </Col>
                     </Row>
                 </Container>
-            </section>
-        </div>
+            </Container>
+
+            {/* Call to Action */}
+            {/* <section className="cta-section py-5 text-white text-center z-index-0">
+                <Container>
+                    <Row className="justify-content-center">
+                        <Col lg={8}>
+                           <h2 className="mb-4">¿Listo para disfrutar de estos servicios?</h2>
+                            <p className="lead mb-4">
+                                Reserva ahora y disfruta de todos nuestros servicios premium durante tu estadía
+                            </p>
+                            <Button onClick={() => navigate("/habitaciones")} className="btn btn-light btn-lg px-5 py-3 rounded-pill z-index-1 ">
+                                Ver Habitaciones
+                            </Button> 
+                        </Col>
+                    </Row>
+                </Container>
+            </section> */}
+        </Container>
+        </>
     );
 };
 

@@ -11,19 +11,19 @@ import { useNavigate } from 'react-router-dom';
 function RegisterForm() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const [datosFormulario, setDatosFormulario] = useState({
     nombre: "",
     email: "",
-    password: "",
-    passwordConfirm: "",
-    profileImage: null,
-    profileImageBase64: null
+    contraseña: "",
+    confirmarContraseña: "",
+    imagenPerfil: null,
+    imagenPerfilBase64: null
   });
   const [mensaje, setMensaje] = useState("");
-  const [errors, setErrors] = useState({});
-  const [Cargando, setCargando] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errores, setErrores] = useState({});
+  const [cargando, setCargando] = useState(false);
+  const [mostrarContraseña, setMostrarContraseña] = useState(false);
+  const [mostrarConfirmacionContraseña, setMostrarConfirmacionContraseña] = useState(false);
 
   const mostrarAlerta = (icono, titulo, texto) => {
     return Swal.mixin({
@@ -35,101 +35,117 @@ function RegisterForm() {
       showConfirmButton: false,
       timer: 1500,
       timerProgressBar: true
-    }).fire(); 
+    }).fire();
   };
 
-  const validateForm = () => {
-    const errores = {};
+  const validarFormulario = () => {
+    const erroresValidacion = {};
     let esValido = true;
 
-    if (!formData.nombre) {
-      errores.nombre = "El nombre es obligatorio";
+    if (!datosFormulario.nombre) {
+      erroresValidacion.nombre = "El nombre es obligatorio";
       esValido = false;
     }
 
-    if (!formData.email) {
-      errores.email = "El correo es obligatorio";
+    if (!datosFormulario.email) {
+      erroresValidacion.email = "El correo es obligatorio";
       esValido = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errores.email = "El correo electrónico no es válido";
-      esValido = false;    
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datosFormulario.email)) {
+      erroresValidacion.email = "El correo electrónico no es válido";
+      esValido = false;
     }
 
-    if (!formData.password) {
-      errores.password = "La contraseña es obligatoria";
-      esValido = false; 
-    } else if (formData.password.length < 6) {
-      errores.password = "La contraseña debe tener al menos 6 caracteres";
-      esValido = false; 
+    if (!datosFormulario.contraseña) {
+      erroresValidacion.contraseña = "La contraseña es obligatoria";
+      esValido = false;
+    } else if (datosFormulario.contraseña.length < 6) {
+      erroresValidacion.contraseña = "La contraseña debe tener al menos 6 caracteres";
+      esValido = false;
     }
 
-    if (!formData.passwordConfirm) {
-      errores.passwordConfirm = "Por favor confirme su contraseña";
-      esValido = false; 
-    } else if (formData.password !== formData.passwordConfirm) {
-      errores.passwordConfirm = "Las contraseñas no coinciden";
-      esValido = false; 
+    if (!datosFormulario.confirmarContraseña) {
+      erroresValidacion.confirmarContraseña = "Por favor confirme su contraseña";
+      esValido = false;
+    } else if (datosFormulario.contraseña !== datosFormulario.confirmarContraseña) {
+      erroresValidacion.confirmarContraseña = "Las contraseñas no coinciden";
+      esValido = false;
     }
 
-    setErrors(errores);
+    setErrores(erroresValidacion);
     return esValido;
   };
 
   const manejarInput = (campo, valor) => {
-    setFormData(prev => ({
+    setDatosFormulario(prev => ({
       ...prev, [campo]: valor
     }));
-    if (errors[campo]) {
-      setErrors(prev => ({
+    if (errores[campo]) {
+      setErrores(prev => ({
         ...prev, [campo]: null
       }));
     }
   };
 
-  const altShowPass = () => {
-    setShowPassword(!showPassword);
+  const alternarContraseña = () => {
+    setMostrarContraseña(!mostrarContraseña);
   };
 
-  const altShowConfirmPass = () => {
-    setShowConfirmPassword(!showConfirmPassword);
+  const alternarConfirmacionContraseña = () => {
+    setMostrarConfirmacionContraseña(!mostrarConfirmacionContraseña);
   };
 
-  const register = async () => {
-    if (!validateForm()) return;
+  const registrarUsuario = async () => {
+    if (!validarFormulario()) return;
 
     try {
       setCargando(true);
 
-      // Call PostUsers with all required parameters including the profile image
-      const userData = await usersCalls.PostUsers(
-        formData.nombre,
-        "",                      // apellido (empty as not collected in form)
-        formData.email,
-        formData.password,       // Using password field for contraseña
-        "usuario",               // rol - default to regular user
-        "",                      // telefono (empty as not collected in form)
-        "",                      // direccion (empty as not collected in form)
-        formData.profileImageBase64  // Sending the base64 string of the image
+      // Estructura de datos para el usuario según el nuevo formato
+      const datosUsuario = {
+        email: datosFormulario.email,
+        password: datosFormulario.contraseña,
+        rol: "usuario",
+        img: {
+          imgPerfil: datosFormulario.imagenPerfilBase64
+        },
+        datos: {
+          nombre: datosFormulario.nombre,
+          telefono: "",  // Vacío ya que no se recolecta en el formulario
+          direccion: ""  // Vacío ya que no se recolecta en el formulario
+        }
+      };
+
+      // Llamar al servicio para crear el usuario con la nueva estructura
+      const usuarioCreado = await usersCalls.PostUsers(
+        datosUsuario.email,
+        datosUsuario.password,
+        datosUsuario.rol,
+        datosUsuario.img,
+        datosUsuario.datos
       );
 
-      // Add the profile image to the user data
-      const completeUserData = {
-        ...userData,
-        ImgPerfil: formData.profileImageBase64
+      // Datos completos del usuario para el login
+      const datosUsuarioCompletos = {
+        ...usuarioCreado,
+        roles: ["usuario"], // Asegurar que tenga rol de usuario para compatibilidad
+        nombre: datosUsuario.datos.nombre,
+        ImgPerfil: datosUsuario.img.imgPerfil
       };
-      
-      // Log in the user using the auth context
-      login(completeUserData);
+
+      // Iniciar sesión con el usuario recién creado
+      login(datosUsuarioCompletos);
 
       await mostrarAlerta("success", "¡Registro exitoso!", "Usuario registrado exitosamente");
       setMensaje("¡Registro exitoso!");
-      setFormData({
+
+      // Limpiar el formulario
+      setDatosFormulario({
         nombre: "",
         email: "",
-        password: "",
-        passwordConfirm: "",
-        profileImage: null,
-        profileImageBase64: null  // Also reset the base64 string
+        contraseña: "",
+        confirmarContraseña: "",
+        imagenPerfil: null,
+        imagenPerfilBase64: null
       });
 
       // Redirigir al usuario a la página principal después del registro
@@ -159,11 +175,11 @@ function RegisterForm() {
               <Form.Label>Nombre</Form.Label>
               <InputGroup>
                 <Form.Control
-                  value={formData.nombre}
+                  value={datosFormulario.nombre}
                   onChange={(e) => manejarInput("nombre", e.target.value)}
-                  isInvalid={!!errors.nombre}
-                  placeholder='Ingrese su nombre'/>
-                <Form.Control.Feedback type='invalid'>{errors.nombre}</Form.Control.Feedback>
+                  isInvalid={!!errores.nombre}
+                  placeholder='Ingrese su nombre' />
+                <Form.Control.Feedback type='invalid'>{errores.nombre}</Form.Control.Feedback>
               </InputGroup>
             </Form.Group>
 
@@ -171,11 +187,11 @@ function RegisterForm() {
               <Form.Label>Correo Electrónico</Form.Label>
               <InputGroup>
                 <Form.Control
-                  value={formData.email}
+                  value={datosFormulario.email}
                   onChange={(e) => manejarInput("email", e.target.value)}
-                  isInvalid={!!errors.email}
-                  placeholder='Ingrese su correo electrónico'/>
-                <Form.Control.Feedback type='invalid'>{errors.email}</Form.Control.Feedback>
+                  isInvalid={!!errores.email}
+                  placeholder='Ingrese su correo electrónico' />
+                <Form.Control.Feedback type='invalid'>{errores.email}</Form.Control.Feedback>
               </InputGroup>
             </Form.Group>
 
@@ -184,18 +200,18 @@ function RegisterForm() {
               <InputGroup>
                 <Form.Control
                   id='contrasena'
-                  disabled={Cargando}
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => manejarInput("password", e.target.value)}
-                  isInvalid={!!errors.password}
-                  placeholder='Ingrese su contraseña'/>
+                  disabled={cargando}
+                  type={mostrarContraseña ? "text" : "password"}
+                  value={datosFormulario.contraseña}
+                  onChange={(e) => manejarInput("contraseña", e.target.value)}
+                  isInvalid={!!errores.contraseña}
+                  placeholder='Ingrese su contraseña' />
                 <Button variant='outline-secondary'
-                  onClick={altShowPass}
-                  disabled={Cargando}>
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  onClick={alternarContraseña}
+                  disabled={cargando}>
+                  {mostrarContraseña ? <EyeOff /> : <Eye />}
                 </Button>
-                <Form.Control.Feedback type='invalid'>{errors.password}</Form.Control.Feedback>
+                <Form.Control.Feedback type='invalid'>{errores.contraseña}</Form.Control.Feedback>
               </InputGroup>
             </Form.Group>
 
@@ -204,17 +220,18 @@ function RegisterForm() {
               <InputGroup>
                 <Form.Control
                   id='confirmarContrasena'
-                  disabled={Cargando}
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={formData.passwordConfirm}
-                  onChange={(e) => manejarInput("passwordConfirm", e.target.value)}
-                  isInvalid={!!errors.passwordConfirm}
-                  placeholder='Confirme su contraseña'/>
+                  disabled={cargando}
+                  type={mostrarConfirmacionContraseña ? "text" : "password"}
+                  value={datosFormulario.confirmarContraseña}
+                  onChange={(e) => manejarInput("confirmarContraseña", e.target.value)}
+                  isInvalid={!!errores.confirmarContraseña}
+                  placeholder='Confirme su contraseña' />
                 <Button variant='outline-secondary'
-                  onClick={altShowConfirmPass}
-                    disabled={Cargando}>
-                    {showConfirmPassword ? <EyeOff /> : <Eye />}
-                  </Button>
+                  onClick={alternarConfirmacionContraseña}
+                  disabled={cargando}>
+                  {mostrarConfirmacionContraseña ? <EyeOff /> : <Eye />}
+                </Button>
+                <Form.Control.Feedback type='invalid'>{errores.confirmarContraseña}</Form.Control.Feedback>
               </InputGroup>
             </Form.Group>
 
@@ -225,36 +242,36 @@ function RegisterForm() {
                 accept="image/*"
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
-                    manejarInput("profileImage", e.target.files[0]);
+                    manejarInput("imagenPerfil", e.target.files[0]);
                     // Convertir la imagen a Base64
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      setFormData(prev => ({
-                        ...prev, profileImageBase64: reader.result
+                    const lector = new FileReader();
+                    lector.onload = () => {
+                      setDatosFormulario(prev => ({
+                        ...prev, imagenPerfilBase64: lector.result
                       }));
                     };
-                    reader.readAsDataURL(e.target.files[0]);
+                    lector.readAsDataURL(e.target.files[0]);
                   }
                 }}
-                isInvalid={!!errors.profileImage}
+                isInvalid={!!errores.imagenPerfil}
               />
-              <Form.Control.Feedback type='invalid'>{errors.profileImage}</Form.Control.Feedback>
-              {formData.profileImage && (
+              <Form.Control.Feedback type='invalid'>{errores.imagenPerfil}</Form.Control.Feedback>
+              {datosFormulario.imagenPerfil && (
                 <div className="mt-2">
                   <small className="text-success">
-                    Imagen seleccionada: {formData.profileImage.name}
+                    Imagen seleccionada: {datosFormulario.imagenPerfil.name}
                   </small>
                 </div>
               )}
             </Form.Group>
 
             <Form.Group>
-              <Button 
-                variant="primary" 
-                className="w-100 mt-4" 
-                onClick={register} 
-                disabled={Cargando}>
-                {Cargando ? (
+              <Button
+                variant="primary"
+                className="w-100 mt-4"
+                onClick={registrarUsuario}
+                disabled={cargando}>
+                {cargando ? (
                   <>
                     <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
                     <span className="ms-2">Cargando...</span>
@@ -269,4 +286,4 @@ function RegisterForm() {
   )
 }
 
-export default RegisterForm
+export default RegisterForm;
