@@ -1,70 +1,114 @@
-import axios from 'axios';
-import { API_URL } from './api';
+const API_URL = 'http://localhost:3001';
 
-// Services API endpoints
-const SERVICES_ENDPOINT = `${API_URL}/services`;
+// Endpoints de API de servicios
+const RUTA_SERVICIOS = `${API_URL}/services`;
 
-// Get all services
-const GetServices = async () => {
+// Obtener todos los servicios
+const obtenerServicios = async () => {
     try {
-        const response = await axios.get(SERVICES_ENDPOINT);
-        return response.data;
+        const respuesta = await fetch(RUTA_SERVICIOS);
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+        return await respuesta.json();
     } catch (error) {
-        console.error('Error fetching services:', error);
+        console.error('Error al obtener servicios:', error);
         throw error;
     }
 };
 
-// Get service by ID
-const GetService = async (serviceId) => {
+// Obtener servicio por ID
+const obtenerServicio = async (idServicio) => {
     try {
-        const response = await axios.get(`${SERVICES_ENDPOINT}/${serviceId}`);
-        return response.data;
+        const respuesta = await fetch(`${RUTA_SERVICIOS}/${idServicio}`);
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+        return await respuesta.json();
     } catch (error) {
-        console.error(`Error fetching service with ID ${serviceId}:`, error);
+        console.error(`Error al obtener servicio con ID ${idServicio}:`, error);
         throw error;
     }
 };
 
-// Add new service
-const AddService = async (serviceData) => {
+// Añadir nuevo servicio
+const agregarServicio = async (datosServicio) => {
     try {
-        const response = await axios.post(SERVICES_ENDPOINT, serviceData);
-        return response.data;
+        console.log('Agregando servicio:', JSON.stringify(datosServicio, null, 2));
+        const respuesta = await fetch(RUTA_SERVICIOS, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosServicio)
+        });
+        
+        if (!respuesta.ok) {
+            const error = await respuesta.text();
+            console.error('Error del servidor:', error);
+            throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+        
+        return await respuesta.json();
     } catch (error) {
-        console.error('Error adding service:', error);
+        console.error('Error al agregar servicio:', error);
         throw error;
     }
 };
 
-// Update service
-const UpdateService = async (serviceData) => {
+// Actualizar servicio
+const actualizarServicio = async (datosServicio) => {
     try {
-        const response = await axios.put(`${SERVICES_ENDPOINT}/${serviceData.id}`, serviceData);
-        return response.data;
+        console.log('Actualizando servicio:', JSON.stringify(datosServicio, null, 2));
+        const respuesta = await fetch(`${RUTA_SERVICIOS}/${datosServicio.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosServicio)
+        });
+        
+        if (!respuesta.ok) {
+            const error = await respuesta.text();
+            console.error('Error del servidor:', error);
+            throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+        
+        return await respuesta.json();
     } catch (error) {
-        console.error('Error updating service:', error);
+        console.error('Error al actualizar servicio:', error);
         throw error;
     }
 };
 
-// Delete service
-const DeleteService = async (serviceId) => {
+// Eliminar servicio
+const eliminarServicio = async (idServicio) => {
     try {
-        const response = await axios.delete(`${SERVICES_ENDPOINT}/${serviceId}`);
-        return response.data;
+        console.log('Eliminando servicio:', idServicio);
+        const respuesta = await fetch(`${RUTA_SERVICIOS}/${idServicio}`, {
+            method: 'DELETE'
+        });
+        
+        if (!respuesta.ok) {
+            const error = await respuesta.text();
+            console.error('Error del servidor:', error);
+            throw new Error(`Error HTTP: ${respuesta.status}`);
+        }
+        
+        return true;
     } catch (error) {
-        console.error('Error deleting service:', error);
+        console.error('Error al eliminar servicio:', error);
         throw error;
     }
 };
 
-const servicesCalls = {
-    GetServices,
-    GetService,
-    AddService,
-    UpdateService,
-    DeleteService
+// Exportación explícita de funciones
+const llamadosServicios = {
+    obtenerServicios,
+    obtenerServicio,
+    agregarServicio,
+    actualizarServicio,
+    eliminarServicio
 };
 
-export default servicesCalls;
+export default llamadosServicios;

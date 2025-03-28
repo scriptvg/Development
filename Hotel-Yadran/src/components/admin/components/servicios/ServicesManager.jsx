@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Table, Badge, Alert, Spinner } from 'react-bootstrap';
-import { PlusCircle, Search, List, Grid, Settings, Filter } from 'lucide-react';
+import { PlusCircle, Search, List, Grid, Settings } from 'lucide-react'; // Removed unused 'Filter'
 import Swal from 'sweetalert2';
-import servicesDataService from './services/servicesDataService.jsx';
+import servicesDataService from '../../../../config/services/servicesCalls'; // Adjusted import path
+// Removed unused import 'useAuth'
 import ServiceForm from './components/ServiceForm.jsx';
 import ServiceCard from './components/ServiceCard.jsx';
 import TableSettingsPanel from '../habitaciones/components/table/TableSettingsPanel.jsx';
 import SearchFilter from '../habitaciones/components/filters/SearchFilter.jsx';
-import { LISTA_SERVICIOS } from '../../utils/ServicesConfig.jsx';
+
 import './styles/servicesManager.css';
 
 /**
@@ -49,7 +50,7 @@ const ServicesManager = () => {
     // Apply filtering when searchTerm or selectedVariant changes
     useEffect(() => {
         filterServices();
-    }, [searchTerm, selectedVariant, services]);
+    }, [searchTerm, selectedVariant, services, filterServices]); // Added 'filterServices' to dependency array
     
     // Load services from local data service
     const loadServices = () => {
@@ -116,7 +117,7 @@ const ServicesManager = () => {
     const handleAddService = (serviceData) => {
         servicesDataService.addService(
             serviceData,
-            (result) => {
+            () => { // Removed unused 'result'
                 Swal.fire({
                     icon: 'success',
                     title: 'Servicio añadido',
@@ -127,7 +128,7 @@ const ServicesManager = () => {
                 setShowForm(false);
                 setEditingService(null);
             },
-            (error) => {
+            () => { // Removed unused 'error'
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
