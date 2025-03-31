@@ -21,7 +21,7 @@ const ContactSection = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        
+
         if (form.checkValidity() === false) {
             e.stopPropagation();
         } else {
@@ -29,11 +29,11 @@ const ContactSection = () => {
             console.log("Form data:", formData);
             setSubmitted(true);
             setFormData({ name: '', email: '', message: '' });
-            
+
             // Reset submitted state after 5 seconds
             setTimeout(() => setSubmitted(false), 5000);
         }
-        
+
         setValidated(true);
     };
 
@@ -51,7 +51,7 @@ const ContactSection = () => {
                         </p>
                     </Col>
                 </Row>
-                
+
                 {submitted && (
                     <Row className="mb-4">
                         <Col md={{ span: 6, offset: 3 }}>
@@ -61,16 +61,16 @@ const ContactSection = () => {
                         </Col>
                     </Row>
                 )}
-                
+
                 <Row>
                     <Col md={{ span: 6, offset: 3 }}>
-                        <Form noValidate validated={validated} onSubmit={handleSubmit} 
-                              className="contact-form p-4 bg-white shadow-sm rounded">
+                        <Form noValidate validated={validated} onSubmit={handleSubmit}
+                            className="contact-form p-4 bg-white shadow-sm rounded">
                             <Form.Group className="mb-3" controlId="formName">
                                 <Form.Label>Name</Form.Label>
-                                <Form.Control 
-                                    type="text" 
-                                    placeholder="Enter your name" 
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter your name"
                                     required
                                     value={formData.name}
                                     onChange={handleChange}
@@ -79,12 +79,12 @@ const ContactSection = () => {
                                     Please provide your name.
                                 </Form.Control.Feedback>
                             </Form.Group>
-                            
+
                             <Form.Group className="mb-3" controlId="formEmail">
                                 <Form.Label>Email</Form.Label>
-                                <Form.Control 
-                                    type="email" 
-                                    placeholder="Enter your email" 
+                                <Form.Control
+                                    type="email"
+                                    placeholder="Enter your email"
                                     required
                                     value={formData.email}
                                     onChange={handleChange}
@@ -93,13 +93,13 @@ const ContactSection = () => {
                                     Please provide a valid email address.
                                 </Form.Control.Feedback>
                             </Form.Group>
-                            
+
                             <Form.Group className="mb-3" controlId="formMessage">
                                 <Form.Label>Message</Form.Label>
-                                <Form.Control 
-                                    as="textarea" 
-                                    rows={4} 
-                                    placeholder="Enter your message" 
+                                <Form.Control
+                                    as="textarea"
+                                    rows={4}
+                                    placeholder="Enter your message"
                                     required
                                     value={formData.message}
                                     onChange={handleChange}
@@ -108,7 +108,7 @@ const ContactSection = () => {
                                     Please enter your message.
                                 </Form.Control.Feedback>
                             </Form.Group>
-                            
+
                             <Button variant="primary" type="submit" className="w-100 py-2 mt-3">
                                 Submit
                             </Button>

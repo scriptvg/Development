@@ -55,7 +55,7 @@ const Testimonials = () => {
                         <p className="lead">Hear from our satisfied guests about their experiences</p>
                     </Col>
                 </Row>
-                
+
                 <Row>
                     {testimonials.map((testimonial) => (
                         <Col key={testimonial.id} md={4} className="mb-4">
@@ -63,12 +63,12 @@ const Testimonials = () => {
                                 <Card.Body className="p-4">
                                     <div className="d-flex align-items-center mb-4">
                                         <div className="testimonial-avatar me-3">
-                                            <img 
-                                                src={testimonial.avatar} 
-                                                alt={testimonial.name} 
-                                                className="rounded-circle" 
-                                                width="60" 
-                                                height="60" 
+                                            <img
+                                                src={testimonial.avatar}
+                                                alt={testimonial.name}
+                                                className="rounded-circle"
+                                                width="60"
+                                                height="60"
                                             />
                                         </div>
                                         <div>
@@ -77,7 +77,7 @@ const Testimonials = () => {
                                             {renderStars(testimonial.rating)}
                                         </div>
                                     </div>
-                                    
+
                                     <div className="testimonial-content">
                                         <p className="card-text quote-text">"{testimonial.feedback}"</p>
                                         <p className="card-text text-muted mt-3 small">{testimonial.date}</p>
@@ -87,7 +87,7 @@ const Testimonials = () => {
                         </Col>
                     ))}
                 </Row>
-                
+
                 <Row className="mt-4">
                     <Col className="text-center">
                         <a href="#" className="btn btn-outline-primary">View All Reviews</a>
