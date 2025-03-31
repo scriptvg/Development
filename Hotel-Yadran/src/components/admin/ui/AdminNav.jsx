@@ -13,7 +13,7 @@ import {
 import { useAuth } from '../../../config/context/auth/useAuth';
 import './adminNav.css';
 
-function AdminNav() {
+const AdminNav = () => {
     const location = useLocation();
     const { logout } = useAuth();
     
@@ -98,6 +98,6 @@ function AdminNav() {
             </div>
         </div>
     );
-}
+};
 
-export default AdminNav;
+export { AdminNav };

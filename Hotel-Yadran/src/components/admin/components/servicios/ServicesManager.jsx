@@ -1,15 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Table, Badge, Alert, Spinner } from 'react-bootstrap';
-import { PlusCircle, Search, List, Grid, Settings } from 'lucide-react'; // Removed unused 'Filter'
+import { PlusCircle, Search, List, Grid, Settings } from 'lucide-react';
 import Swal from 'sweetalert2';
-import servicesDataService from '../../../../config/services/servicesCalls'; // Adjusted import path
-// Removed unused import 'useAuth'
+import llamadosServicios from '../../../../config/services/servicesCalls';
 import ServiceForm from './components/ServiceForm.jsx';
 import ServiceCard from './components/ServiceCard.jsx';
 import TableSettingsPanel from '../habitaciones/components/table/TableSettingsPanel.jsx';
 import SearchFilter from '../habitaciones/components/filters/SearchFilter.jsx';
 
 import './styles/servicesManager.css';
+
+// Función auxiliar para filtrar servicios - definida antes de usarla en el componente
+const filterServices = (servicios = [], terminoBusqueda = '', selectedVariant = '') => {
+    if (!servicios || !Array.isArray(servicios)) return [];
+
+    return servicios.filter(servicio => {
+        if (!servicio) return false;
+
+        // Filtrar por término de búsqueda
+        const busquedaCoincide = !terminoBusqueda ||
+            (servicio.etiqueta?.toLowerCase() || '').includes(terminoBusqueda.toLowerCase()) ||
+            (servicio.valor?.toLowerCase() || '').includes(terminoBusqueda.toLowerCase()) ||
+            (servicio.descripcion?.toLowerCase() || '').includes(terminoBusqueda.toLowerCase());
+
+        // Filtrar por variante
+        const varianteCoincide = !selectedVariant || servicio.variante === selectedVariant;
+
+        return busquedaCoincide && varianteCoincide;
+    });
+};
 
 /**
  * ServicesManager - Admin component for managing hotel services
@@ -20,129 +39,109 @@ const ServicesManager = () => {
     const [filteredServices, setFilteredServices] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    
+
     // State for UI 
     const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedVariant, setSelectedVariant] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [editingService, setEditingService] = useState(null);
-    
+
     // Table settings state
     const [tableSettings, setTableSettings] = useState({
         visibleColumns: {
             id: true,
             etiqueta: true,
             valor: true,
-            descripcion: true, 
+            descripcion: true,
             variante: true,
             actions: true
         },
         sortBy: 'etiqueta',
         sortDirection: 'asc'
     });
-    
+
     // Load services when component mounts
     useEffect(() => {
         loadServices();
     }, []);
-    
+
     // Apply filtering when searchTerm or selectedVariant changes
     useEffect(() => {
-        filterServices();
-    }, [searchTerm, selectedVariant, services, filterServices]); // Added 'filterServices' to dependency array
-    
-    // Load services from local data service
-    const loadServices = () => {
-        setIsLoading(true);
-        setError(null);
-        
-        servicesDataService.getAllServices(
-            (data) => {
-                setServices(data);
-                setFilteredServices(data);
-                setIsLoading(false);
-            },
-            (err) => {
-                console.error("Error loading services:", err);
-                setError("No se pudieron cargar los servicios.");
-                setIsLoading(false);
-            }
-        );
-    };
-    
-    // Filter services based on search term and variant
-    const filterServices = () => {
-        let filtered = [...services];
-        
-        // Apply search filter
-        if (searchTerm.trim() !== '') {
-            const search = searchTerm.toLowerCase();
-            filtered = filtered.filter(service => 
-                service.etiqueta.toLowerCase().includes(search) ||
-                service.valor.toLowerCase().includes(search) ||
-                service.descripcion.toLowerCase().includes(search)
-            );
-        }
-        
-        // Apply variant filter
-        if (selectedVariant) {
-            filtered = filtered.filter(service => 
-                service.variante === selectedVariant
-            );
-        }
-        
+        const filtered = filterServices(services, searchTerm, selectedVariant);
+
         // Apply sorting from table settings
         if (tableSettings.sortBy) {
             filtered.sort((a, b) => {
                 const aValue = a[tableSettings.sortBy] || '';
                 const bValue = b[tableSettings.sortBy] || '';
-                
+
                 // Handle case-insensitive string comparison
                 if (typeof aValue === 'string' && typeof bValue === 'string') {
                     const comparison = aValue.localeCompare(bValue);
                     return tableSettings.sortDirection === 'asc' ? comparison : -comparison;
                 }
-                
+
                 // Handle number comparison
                 const comparison = aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
                 return tableSettings.sortDirection === 'asc' ? comparison : -comparison;
             });
         }
-        
+
         setFilteredServices(filtered);
+    }, [searchTerm, selectedVariant, services, tableSettings]);
+
+    // Load services from API
+    const loadServices = () => {
+        setIsLoading(true);
+        setError(null);
+
+        llamadosServicios.obtenerServicios()
+            .then(data => {
+                setServices(data);
+                setFilteredServices(data);
+                setIsLoading(false);
+            })
+            .catch(err => {
+                console.error("Error loading services:", err);
+                setError("No se pudieron cargar los servicios.");
+                setIsLoading(false);
+            });
     };
-    
-    // Add new service (client-side)
+
+    // Add new service
     const handleAddService = (serviceData) => {
-        servicesDataService.addService(
-            serviceData,
-            () => { // Removed unused 'result'
+        // Asegurar que tiene ID único si es nuevo
+        const nuevoServicio = {
+            ...serviceData,
+            id: `srv-${Date.now()}`
+        };
+
+        llamadosServicios.agregarServicio(nuevoServicio)
+            .then(result => {
                 Swal.fire({
                     icon: 'success',
                     title: 'Servicio añadido',
                     text: 'El servicio ha sido añadido con éxito'
                 });
-                // Update local state to show the new service immediately
+                // Update local state
                 setServices(prevServices => [...prevServices, result]);
                 setShowForm(false);
                 setEditingService(null);
-            },
-            () => { // Removed unused 'error'
+            })
+            .catch(error => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'No se pudo añadir el servicio'
                 });
-            }
-        );
+            });
     };
-    
+
     // Update existing service
     const handleUpdateService = (serviceData) => {
-        servicesDataService.updateService(
-            serviceData,
-            (result) => {
+        llamadosServicios.actualizarServicio(serviceData)
+            .then(result => {
                 Swal.fire({
                     icon: 'success',
                     title: 'Servicio actualizado',
@@ -151,17 +150,16 @@ const ServicesManager = () => {
                 setServices(services.map(s => s.id === result.id ? result : s));
                 setShowForm(false);
                 setEditingService(null);
-            },
-            (error) => {
+            })
+            .catch(error => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'No se pudo actualizar el servicio'
                 });
-            }
-        );
+            });
     };
-    
+
     // Delete service
     const handleDeleteService = (serviceId) => {
         Swal.fire({
@@ -175,49 +173,47 @@ const ServicesManager = () => {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                servicesDataService.deleteService(
-                    serviceId,
-                    (result) => {
+                llamadosServicios.eliminarServicio(serviceId)
+                    .then(() => {
                         Swal.fire(
                             '¡Eliminado!',
                             'El servicio ha sido eliminado.',
                             'success'
                         );
                         setServices(services.filter(s => s.id !== serviceId));
-                    },
-                    (error) => {
+                    })
+                    .catch(error => {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
                             text: 'No se pudo eliminar el servicio'
                         });
-                    }
-                );
+                    });
             }
         });
     };
-    
+
     // Edit service
     const handleEditService = (service) => {
         setEditingService(service);
         setShowForm(true);
     };
-    
+
     // Handle form submission for add/update
     const handleFormSubmit = (serviceData) => {
         if (editingService) {
-            handleUpdateService({...serviceData, id: editingService.id});
+            handleUpdateService({ ...serviceData, id: editingService.id });
         } else {
             handleAddService(serviceData);
         }
     };
-    
+
     // Handle form cancellation
     const handleFormCancel = () => {
         setShowForm(false);
         setEditingService(null);
     };
-    
+
     // Handle table settings change
     const handleColumnVisibilityChange = (columnId, isVisible) => {
         if (typeof columnId === 'string') {
@@ -236,7 +232,7 @@ const ServicesManager = () => {
             });
         }
     };
-    
+
     // Handle sorting change
     const handleSortChange = (sortBy, sortDirection) => {
         setTableSettings({
@@ -245,7 +241,7 @@ const ServicesManager = () => {
             sortDirection
         });
     };
-    
+
     // Reset table settings
     const handleResetTableSettings = () => {
         setTableSettings({
@@ -253,7 +249,7 @@ const ServicesManager = () => {
                 id: true,
                 etiqueta: true,
                 valor: true,
-                descripcion: true, 
+                descripcion: true,
                 variante: true,
                 actions: true
             },
@@ -261,7 +257,7 @@ const ServicesManager = () => {
             sortDirection: 'asc'
         });
     };
-    
+
     // Define available variants
     const variantOptions = [
         { value: '', label: 'Todos' },
@@ -273,7 +269,7 @@ const ServicesManager = () => {
         { value: 'info', label: 'Información' },
         { value: 'dark', label: 'Oscuro' }
     ];
-    
+
     // Columns configuration for the table
     const columns = {
         id: { label: 'ID' },
@@ -283,7 +279,7 @@ const ServicesManager = () => {
         variante: { label: 'Variante' },
         actions: { label: 'Acciones' }
     };
-    
+
     return (
         <Container fluid className="py-4 services-manager">
             <Card className="shadow-sm border-0 mb-4">
@@ -295,28 +291,28 @@ const ServicesManager = () => {
                                 Administra los servicios disponibles en tu hotel
                             </p>
                         </div>
-                        
+
                         <div className="d-flex gap-2">
-                            <Button 
-                                variant={viewMode === 'grid' ? 'primary' : 'outline-primary'} 
+                            <Button
+                                variant={viewMode === 'grid' ? 'primary' : 'outline-primary'}
                                 className="d-flex align-items-center gap-2"
                                 onClick={() => setViewMode('grid')}
                             >
                                 <Grid size={18} />
                                 <span className="d-none d-md-inline">Cuadrícula</span>
                             </Button>
-                            
-                            <Button 
-                                variant={viewMode === 'table' ? 'primary' : 'outline-primary'} 
+
+                            <Button
+                                variant={viewMode === 'table' ? 'primary' : 'outline-primary'}
                                 className="d-flex align-items-center gap-2"
                                 onClick={() => setViewMode('table')}
                             >
                                 <List size={18} />
                                 <span className="d-none d-md-inline">Tabla</span>
                             </Button>
-                            
-                            <Button 
-                                variant="success" 
+
+                            <Button
+                                variant="success"
                                 className="d-flex align-items-center gap-2 ms-2"
                                 onClick={() => {
                                     setEditingService(null);
@@ -328,10 +324,10 @@ const ServicesManager = () => {
                             </Button>
                         </div>
                     </div>
-                    
+
                     <Row className="g-3">
                         <Col md={8}>
-                            <SearchFilter 
+                            <SearchFilter
                                 placeholder="Buscar servicios..."
                                 value={searchTerm}
                                 onChange={setSearchTerm}
@@ -339,9 +335,9 @@ const ServicesManager = () => {
                         </Col>
                         <Col md={4}>
                             <div className="d-flex gap-2">
-                                <select 
-                                    className="form-select" 
-                                    value={selectedVariant} 
+                                <select
+                                    className="form-select"
+                                    value={selectedVariant}
                                     onChange={(e) => setSelectedVariant(e.target.value)}
                                     aria-label="Filtrar por variante"
                                 >
@@ -351,9 +347,9 @@ const ServicesManager = () => {
                                         </option>
                                     ))}
                                 </select>
-                                
-                                <Button 
-                                    variant="outline-secondary" 
+
+                                <Button
+                                    variant="outline-secondary"
                                     onClick={() => {
                                         setSearchTerm('');
                                         setSelectedVariant('');
@@ -364,7 +360,7 @@ const ServicesManager = () => {
                             </div>
                         </Col>
                     </Row>
-                    
+
                     {/* Stats row */}
                     <div className="stats-row py-3 my-3 border-top border-bottom">
                         <Row className="g-3">
@@ -392,7 +388,7 @@ const ServicesManager = () => {
                     </div>
                 </Card.Body>
             </Card>
-            
+
             {/* Form for adding/editing */}
             {showForm && (
                 <Card className="shadow-sm border-0 mb-4">
@@ -400,7 +396,7 @@ const ServicesManager = () => {
                         <h5 className="mb-0">{editingService ? 'Editar Servicio' : 'Añadir Servicio'}</h5>
                     </Card.Header>
                     <Card.Body>
-                        <ServiceForm 
+                        <ServiceForm
                             service={editingService}
                             onSubmit={handleFormSubmit}
                             onCancel={handleFormCancel}
@@ -408,7 +404,7 @@ const ServicesManager = () => {
                     </Card.Body>
                 </Card>
             )}
-            
+
             {/* Error display if needed */}
             {error && (
                 <Alert variant="warning" className="mb-4">
@@ -416,7 +412,7 @@ const ServicesManager = () => {
                     <p>{error}</p>
                 </Alert>
             )}
-            
+
             {/* Loading spinner */}
             {isLoading ? (
                 <div className="text-center py-5">
@@ -429,12 +425,12 @@ const ServicesManager = () => {
                         <Search size={48} className="text-muted mb-3" />
                         <h4>No se encontraron servicios</h4>
                         <p className="text-muted">
-                            {searchTerm || selectedVariant ? 
-                                'Prueba a ajustar los filtros de búsqueda' : 
+                            {searchTerm || selectedVariant ?
+                                'Prueba a ajustar los filtros de búsqueda' :
                                 'Añade tu primer servicio para comenzar'}
                         </p>
-                        <Button 
-                            variant="primary" 
+                        <Button
+                            variant="primary"
                             onClick={() => {
                                 setEditingService(null);
                                 setShowForm(true);
@@ -451,7 +447,7 @@ const ServicesManager = () => {
                     {/* Table view for services */}
                     {viewMode === 'table' && (
                         <>
-                            <TableSettingsPanel 
+                            <TableSettingsPanel
                                 columns={columns}
                                 onColumnVisibilityChange={handleColumnVisibilityChange}
                                 onSortChange={handleSortChange}
@@ -460,7 +456,7 @@ const ServicesManager = () => {
                                 onPrint={() => window.print()}
                                 currentSettings={tableSettings}
                             />
-                            
+
                             <Card className="shadow-sm border-0">
                                 <Card.Body className="p-0">
                                     <div className="table-responsive">
@@ -501,8 +497,8 @@ const ServicesManager = () => {
                                                             <td>
                                                                 <div className="d-flex align-items-center">
                                                                     <div className="service-icon me-2">
-                                                                        {service.icono && React.isValidElement(service.icono) 
-                                                                            ? React.cloneElement(service.icono, { size: 20 }) 
+                                                                        {service.icono && React.isValidElement(service.icono)
+                                                                            ? React.cloneElement(service.icono, { size: 20 })
                                                                             : <Settings size={20} />}
                                                                     </div>
                                                                     <span className="fw-medium">{service.etiqueta}</span>
@@ -515,7 +511,7 @@ const ServicesManager = () => {
                                                             </td>
                                                         )}
                                                         {tableSettings.visibleColumns.descripcion && (
-                                                            <td className="text-truncate" style={{maxWidth: '300px'}}>
+                                                            <td className="text-truncate" style={{ maxWidth: '300px' }}>
                                                                 {service.descripcion}
                                                             </td>
                                                         )}
@@ -528,16 +524,16 @@ const ServicesManager = () => {
                                                         )}
                                                         {tableSettings.visibleColumns.actions && (
                                                             <td className="text-center">
-                                                                <Button 
-                                                                    variant="outline-primary" 
-                                                                    size="sm" 
+                                                                <Button
+                                                                    variant="outline-primary"
+                                                                    size="sm"
                                                                     className="me-1"
                                                                     onClick={() => handleEditService(service)}
                                                                 >
                                                                     Editar
                                                                 </Button>
-                                                                <Button 
-                                                                    variant="outline-danger" 
+                                                                <Button
+                                                                    variant="outline-danger"
                                                                     size="sm"
                                                                     onClick={() => handleDeleteService(service.id || service.valor)}
                                                                 >
@@ -554,13 +550,13 @@ const ServicesManager = () => {
                             </Card>
                         </>
                     )}
-                    
+
                     {/* Grid view for services */}
                     {viewMode === 'grid' && (
                         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
                             {filteredServices.map(service => (
                                 <Col key={service.id || service.valor}>
-                                    <ServiceCard 
+                                    <ServiceCard
                                         service={service}
                                         onEdit={() => handleEditService(service)}
                                         onDelete={() => handleDeleteService(service.id || service.valor)}

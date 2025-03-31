@@ -1,7 +1,4 @@
-import React from 'react';/* 
-<<<<<<< HEAD
-import { CheckCircle, XCircle, Trash2, Clock, Brush, Calendar, Search } from 'lucide-react';
-======= */
+import React from 'react';
 import { CheckCircle, XCircle, Wrench, FilePlus, CirclePlus, X } from 'lucide-react';
 
 export const TAMAÑO_ICONO = 18;
@@ -35,7 +32,6 @@ export const LISTA_ESTADOS = [
     { 
         valor: ESTADOS.MANTENIMIENTO, 
         etiqueta: 'En Mantenimiento', 
-
         IconoComponente: Wrench,
         variante: 'warning',
         icono: <Wrench size={TAMAÑO_ICONO} />

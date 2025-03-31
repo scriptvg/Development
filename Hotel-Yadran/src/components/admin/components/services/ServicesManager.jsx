@@ -16,6 +16,25 @@ const iconosMap = {
     FaBiking, FaBed, FaUtensils
 };
 
+// Función auxiliar para filtrar servicios (definida antes de usarla)
+const filterServices = (servicios = [], terminoBusqueda = '', soloHabilitados = false) => {
+    if (!servicios || !Array.isArray(servicios)) return [];
+
+    return servicios.filter(servicio => {
+        if (!servicio) return false;
+
+        // Filtrar por término de búsqueda en nombre y descripción
+        const busquedaCoincide = !terminoBusqueda ||
+            (servicio.etiqueta?.toLowerCase() || '').includes(terminoBusqueda.toLowerCase()) ||
+            (servicio.descripcion?.toLowerCase() || '').includes(terminoBusqueda.toLowerCase());
+
+        // Filtrar por estado de habilitado
+        const estadoCoincide = !soloHabilitados || servicio.habilitado !== false;
+
+        return busquedaCoincide && estadoCoincide;
+    });
+};
+
 const ServicesManager = () => {
     // Estado del componente
     const [servicios, setServicios] = useState([]);
@@ -47,7 +66,6 @@ const ServicesManager = () => {
         setCargando(true);
         try {
             const datos = await llamadosServicios.obtenerServicios();
-            console.log("Servicios cargados desde la API:", datos);
             setServicios(datos);
             setError(null);
         } catch (error) {
@@ -84,26 +102,22 @@ const ServicesManager = () => {
             cargarServicios();
         } catch (error) {
             console.error('Error al actualizar estado del servicio:', error);
-            alert(`Error al actualizar estado: ${error.message}`);
         }
     };
 
     // Enviar formulario
     const enviarFormulario = async (e) => {
         e.preventDefault();
-        
+
         try {
             // Crear una copia del servicio actual con todos los campos necesarios
             const servicioParaEnviar = {
                 ...servicioActual,
                 valor: servicioActual.valor || generarValor(servicioActual.etiqueta)
             };
-            
-            console.log('Enviando formulario con:', servicioParaEnviar);
-            
+
             if (servicioParaEnviar.id) {
                 await llamadosServicios.actualizarServicio(servicioParaEnviar);
-                console.log('Servicio actualizado con éxito');
             } else {
                 // Para nuevos servicios, generamos un ID de tipo "srv-X"
                 const nuevoId = `srv-${Date.now()}`;
@@ -112,12 +126,10 @@ const ServicesManager = () => {
                     id: nuevoId,
                     habilitado: true
                 };
-                
-                console.log('Nuevo servicio a agregar:', nuevoServicio);
+
                 await llamadosServicios.agregarServicio(nuevoServicio);
-                console.log('Servicio agregado con éxito');
             }
-            
+
             // Recargar servicios y resetear formulario
             await cargarServicios();
             setMostrarFormulario(false);
@@ -133,13 +145,11 @@ const ServicesManager = () => {
             });
         } catch (error) {
             console.error('Error al guardar servicio:', error);
-            alert(`Error al guardar servicio: ${error.message}`);
         }
     };
 
     // Abrir formulario para editar
     const editarServicio = (servicio) => {
-        console.log('Editando servicio:', servicio);
         // Asegurarse de que todos los campos están presentes
         const servicioCompleto = {
             etiqueta: '',
@@ -164,18 +174,12 @@ const ServicesManager = () => {
                 await cargarServicios();
             } catch (error) {
                 console.error('Error al eliminar servicio:', error);
-                alert(`Error al eliminar servicio: ${error.message}`);
             }
         }
     };
 
     // Filtrar servicios por término de búsqueda y estado de habilitado
-    const serviciosFiltrados = servicios
-        .filter(servicio =>
-            (servicio.etiqueta?.toLowerCase() || '').includes(terminoBusqueda.toLowerCase()) ||
-            (servicio.descripcion?.toLowerCase() || '').includes(terminoBusqueda.toLowerCase())
-        )
-        .filter(servicio => !mostrarSoloHabilitados || servicio.habilitado);
+    const serviciosFiltrados = filterServices(servicios, terminoBusqueda, mostrarSoloHabilitados);
 
     // Estadísticas para el panel
     const totalServicios = servicios.length;
@@ -253,7 +257,7 @@ const ServicesManager = () => {
                         >
                             <FaTable />
                         </Button>
-                        
+
                         <Form.Check
                             type="switch"
                             id="switchMostrarHabilitados"
@@ -302,7 +306,7 @@ const ServicesManager = () => {
                                     <tr key={servicio.id} className={!servicio.habilitado ? 'table-secondary' : ''}>
                                         <td>{index + 1}</td>
                                         <td>
-                                            <div className="service-icon" style={{ 
+                                            <div className="service-icon" style={{
                                                 backgroundColor: servicio.variante ? `var(--bs-${servicio.variante})20` : '#f8f9fa',
                                                 opacity: servicio.habilitado ? 1 : 0.5
                                             }}>
@@ -326,9 +330,9 @@ const ServicesManager = () => {
                                                     </Tooltip>
                                                 }
                                             >
-                                                <Button 
-                                                    variant={servicio.habilitado ? "outline-success" : "outline-secondary"} 
-                                                    size="sm" 
+                                                <Button
+                                                    variant={servicio.habilitado ? "outline-success" : "outline-secondary"}
+                                                    size="sm"
                                                     className="me-1"
                                                     onClick={() => toggleServicioEstado(servicio)}
                                                 >
@@ -356,19 +360,19 @@ const ServicesManager = () => {
                                                 <Badge bg={servicio.habilitado ? 'success' : 'secondary'} className="py-1 px-2">
                                                     {servicio.habilitado ? 'Activo' : 'Inactivo'}
                                                 </Badge>
-                                                <Button 
-                                                    variant="link" 
+                                                <Button
+                                                    variant="link"
                                                     className="p-0 text-decoration-none"
                                                     onClick={() => toggleServicioEstado(servicio)}
                                                 >
-                                                    {servicio.habilitado ? 
-                                                        <FaToggleOn size={20} className="text-success" /> : 
+                                                    {servicio.habilitado ?
+                                                        <FaToggleOn size={20} className="text-success" /> :
                                                         <FaToggleOff size={20} className="text-secondary" />
                                                     }
                                                 </Button>
                                             </div>
                                             <div className="service-icon-wrapper mb-3">
-                                                <div className="service-icon-bg" style={{ 
+                                                <div className="service-icon-bg" style={{
                                                     backgroundColor: servicio.variante ? `var(--bs-${servicio.variante})20` : '#f8f9fa',
                                                     opacity: servicio.habilitado ? 1 : 0.5
                                                 }}>
@@ -471,7 +475,7 @@ const ServicesManager = () => {
                                             id="switchHabilitado"
                                             label="Servicio habilitado"
                                             checked={servicioActual.habilitado === undefined ? true : servicioActual.habilitado}
-                                            onChange={(e) => setServicioActual({...servicioActual, habilitado: e.target.checked})}
+                                            onChange={(e) => setServicioActual({ ...servicioActual, habilitado: e.target.checked })}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -481,8 +485,8 @@ const ServicesManager = () => {
                                     <Form.Group className="mb-3">
                                         <Form.Label>Icono</Form.Label>
                                         <div className="d-flex">
-                                            <div className="icon-preview me-2" style={{ 
-                                                backgroundColor: servicioActual.variante ? `var(--bs-${servicioActual.variante})20` : '#f8f9fa' 
+                                            <div className="icon-preview me-2" style={{
+                                                backgroundColor: servicioActual.variante ? `var(--bs-${servicioActual.variante})20` : '#f8f9fa'
                                             }}>
                                                 {renderizarIcono(servicioActual.icono, servicioActual.variante ? `var(--bs-${servicioActual.variante})` : '#212529', servicioActual.size || 18)}
                                             </div>

@@ -19,7 +19,7 @@
 }
 
 .page-item .page-link:hover {
-    background-color: #e9ecef;
+    background-color: #f8f9fa;
     color: #212529;
     transform: translateY(-2px);
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
@@ -73,6 +73,23 @@
     border: 1px solid #dee2e6;
     display: flex;
     align-items: center;
+    margin-top: 1.5rem;
+}
+
+.pagination .page-item .page-link {
+    color: #3498db;
+    border-radius: 4px;
+    margin: 0 2px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+
+.pagination .page-item .page-link:hover {
+    background-color: #f8f9fa;
 }
 
 /* Estilos para el selector de items por página */
@@ -102,19 +119,19 @@
         gap: 1rem;
         padding: 0.5rem;
     }
-    
+
     .pagination-settings,
     .pagination-controls {
         width: 100%;
         justify-content: center;
     }
-    
+
     .pagination-info {
         text-align: center;
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
     }
-    
+
     .pagination {
         justify-content: center;
     }
@@ -193,19 +210,19 @@
         -webkit-overflow-scrolling: touch;
         padding-bottom: 5px;
     }
-    
+
     .custom-tabs .nav-item {
         margin-right: 0;
     }
-    
+
     .custom-tabs .nav-link {
         padding: 0.75rem 1rem;
     }
-    
+
     .custom-tabs .nav-link span:not(.badge) {
         display: none;
     }
-    
+
     .custom-tabs .nav-link span.badge {
         margin-left: 0;
     }

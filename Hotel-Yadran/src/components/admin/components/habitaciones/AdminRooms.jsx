@@ -7,6 +7,7 @@ import "./styles/adminRooms.css";
 import { FilePlus, Paintbrush, Search, Filter, Download } from 'lucide-react';
 import { ESTADOS, LISTA_ESTADOS } from '../../utils/estadosConfig.jsx';
 import roomDataService, { exportToExcel } from './services/roomDataService.jsx';
+// Ensure we're using a single service implementation for room management
 import RoomsTable from './components/table/RoomsTable';
 import EditRoomModal from './EditRoomModal';
 

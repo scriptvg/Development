@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import { Save, X, Check } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import IconSelector from './IconSelector.jsx';
 
 /**
  * ServiceForm - Form for adding or editing a service
- * 
- * @param {Object} props
- * @param {Object} props.service - Service object for editing, null for adding
- * @param {Function} props.onSubmit - Function called with form data on submit
- * @param {Function} props.onCancel - Function called when cancel button is clicked
  */
 const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
@@ -17,11 +12,14 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
         valor: '',
         descripcion: '',
         variante: 'primary',
-        icono: null
+        icono: null,
+        precio: 0,
+        habilitado: true,
+        size: 18
     });
-    
+
     const [validated, setValidated] = useState(false);
-    
+
     // Initialize form with service data if provided
     useEffect(() => {
         if (service) {
@@ -30,20 +28,34 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
                 valor: service.valor || '',
                 descripcion: service.descripcion || '',
                 variante: service.variante || 'primary',
-                icono: service.icono || null
+                icono: service.icono || null,
+                precio: service.precio || 0,
+                habilitado: service.habilitado !== false,
+                size: service.size || 18
             });
         }
     }, [service]);
-    
+
     // Handle input changes
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
-            [name]: value
+            [name]: type === 'checkbox' ? checked : value
         });
     };
-    
+
+    // Handle numeric input
+    const handleNumericChange = (e) => {
+        const { name, value } = e.target;
+        const numericValue = parseFloat(value);
+
+        setFormData({
+            ...formData,
+            [name]: isNaN(numericValue) ? 0 : numericValue
+        });
+    };
+
     // Handle icon selection
     const handleIconSelect = (iconComponent) => {
         setFormData({
@@ -51,26 +63,26 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
             icono: iconComponent
         });
     };
-    
+
     // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         const form = e.currentTarget;
         if (form.checkValidity() === false) {
             e.stopPropagation();
             setValidated(true);
             return;
         }
-        
+
         // Process form data and call onSubmit
         onSubmit(formData);
     };
-    
+
     // Generate slug from etiqueta for valor field
     const generateSlug = () => {
         if (!formData.etiqueta) return;
-        
+
         const slug = formData.etiqueta
             .toLowerCase()
             .replace(/[áàäâã]/g, 'a')
@@ -80,13 +92,13 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
             .replace(/[úùüû]/g, 'u')
             .replace(/ñ/g, 'n')
             .replace(/[^a-z0-9]/g, '_');
-            
+
         setFormData({
             ...formData,
             valor: slug
         });
     };
-    
+
     return (
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Row className="g-3">
@@ -106,7 +118,7 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
-                
+
                 <Col md={6}>
                     <Form.Group controlId="formValor">
                         <Form.Label>
@@ -137,7 +149,7 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
-                
+
                 <Col md={12}>
                     <Form.Group controlId="formDescripcion">
                         <Form.Label>Descripción</Form.Label>
@@ -151,7 +163,41 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
                         />
                     </Form.Group>
                 </Col>
-                
+
+                <Col md={6}>
+                    <Form.Group controlId="formPrecio">
+                        <Form.Label>Precio <span className="text-danger">*</span></Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="precio"
+                            value={formData.precio}
+                            onChange={handleNumericChange}
+                            min="0"
+                            step="0.01"
+                            required
+                        />
+                        <Form.Text className="text-muted">
+                            Precio del servicio (0 si es gratuito).
+                        </Form.Text>
+                    </Form.Group>
+                </Col>
+
+                <Col md={6}>
+                    <Form.Group controlId="formHabilitado">
+                        <Form.Label>Estado</Form.Label>
+                        <Form.Check
+                            type="switch"
+                            label="Servicio activo"
+                            name="habilitado"
+                            checked={formData.habilitado}
+                            onChange={handleChange}
+                        />
+                        <Form.Text className="text-muted">
+                            Determina si el servicio está disponible.
+                        </Form.Text>
+                    </Form.Group>
+                </Col>
+
                 <Col md={6}>
                     <Form.Group controlId="formVariante">
                         <Form.Label>Variante <span className="text-danger">*</span></Form.Label>
@@ -174,11 +220,11 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
                         </Form.Text>
                     </Form.Group>
                 </Col>
-                
+
                 <Col md={6}>
                     <Form.Group controlId="formIcono">
                         <Form.Label>Ícono <span className="text-danger">*</span></Form.Label>
-                        <IconSelector 
+                        <IconSelector
                             selectedIcon={formData.icono}
                             onSelectIcon={handleIconSelect}
                             variant={formData.variante}
@@ -188,19 +234,36 @@ const ServiceForm = ({ service = null, onSubmit, onCancel }) => {
                         </Form.Text>
                     </Form.Group>
                 </Col>
+
+                <Col md={6}>
+                    <Form.Group controlId="formSize">
+                        <Form.Label>Tamaño del ícono</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="size"
+                            value={formData.size}
+                            onChange={handleNumericChange}
+                            min="12"
+                            max="36"
+                        />
+                        <Form.Text className="text-muted">
+                            Tamaño del ícono en píxeles.
+                        </Form.Text>
+                    </Form.Group>
+                </Col>
             </Row>
-            
+
             <div className="d-flex justify-content-end gap-2 mt-4">
-                <Button 
-                    variant="outline-secondary" 
+                <Button
+                    variant="outline-secondary"
                     onClick={onCancel}
                     type="button"
                 >
                     <X size={18} className="me-1" />
                     Cancelar
                 </Button>
-                <Button 
-                    variant="primary" 
+                <Button
+                    variant="primary"
                     type="submit"
                 >
                     <Save size={18} className="me-1" />

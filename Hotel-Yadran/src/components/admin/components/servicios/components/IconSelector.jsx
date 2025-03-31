@@ -1,201 +1,302 @@
 import React, { useState } from 'react';
-import { Button, Modal, Row, Col, Form, InputGroup } from 'react-bootstrap';
-import { 
-    Settings, Wifi, Coffee, Bed, Bath, Tv, Car, Bike, 
-    Snowflake, Utensils, MapPin, PawPrint, Sun, Shirt,
-    Wine, MessageSquare, Waves, Lock, Car as ParkingIcon, Baby, // Changed Parking to Car and aliased
-    Fan, Dumbbell, Bell, ShowerHead, Computer, Phone, Globe, Bus,
-    Search, X, CheckCircle
-} from 'lucide-react';
+import { Modal, Button, Form, Row, Col, InputGroup, Badge, Nav } from 'react-bootstrap';
+import { Search, Check, X } from 'lucide-react';
+
+// Importar iconos de Font Awesome de manera segura
+import {
+    FaWifi, FaSnowflake, FaTv, FaWater, FaBath, FaCoffee,
+    FaSwimmingPool, FaHome, FaWind, FaWineGlass, FaCar, FaPaw,
+    FaBiking, FaBed, FaUtensils, FaLaptop, FaMoneyBillWave,
+    FaParking, FaShower, FaClock, FaUmbrella, FaGlassMartini,
+    FaKey, FaDumbbell, FaSpa, FaTemperatureHigh, FaPhone,
+    FaConciergeBell, FaLock, FaShuttleVan, FaChair, FaHeart,
+    FaHands, FaDoorOpen, FaWheelchair, FaBaby, FaSmoking,
+    FaSmokingBan, FaGlassCheers, FaMusic, FaCocktail, FaSun,
+    FaMoon, FaMountain, FaTree, FaUmbrellaBeach, FaFish,
+    FaLightbulb, FaTemperatureLow, FaFan, FaUserShield, FaPrint,
+    FaShieldAlt, FaSatelliteDish, FaToolbox, FaSuitcase, FaFirstAid
+} from 'react-icons/fa';
+
+// Definir el objeto de iconos disponibles
+const availableIcons = {
+    // Font Awesome Icons - Solo incluimos FontAwesome para simplificar
+    FaWifi, FaSnowflake, FaTv, FaWater, FaBath, FaCoffee,
+    FaSwimmingPool, FaHome, FaWind, FaWineGlass, FaCar, FaPaw,
+    FaBiking, FaBed, FaUtensils, FaLaptop, FaMoneyBillWave,
+    FaParking, FaShower, FaClock, FaUmbrella, FaGlassMartini,
+    FaKey, FaDumbbell, FaSpa, FaTemperatureHigh, FaPhone,
+    FaConciergeBell, FaLock, FaShuttleVan, FaChair, FaHeart,
+    FaHands, FaDoorOpen, FaWheelchair, FaBaby, FaSmoking,
+    FaSmokingBan, FaGlassCheers, FaMusic, FaCocktail, FaSun,
+    FaMoon, FaMountain, FaTree, FaUmbrellaBeach, FaFish,
+    FaLightbulb, FaTemperatureLow, FaFan, FaUserShield, FaPrint,
+    FaShieldAlt, FaSatelliteDish, FaToolbox, FaSuitcase, FaFirstAid
+};
+
+// Categorías de iconos para facilitar la navegación
+const iconCategories = {
+    'Habitación': [
+        'FaBed', 'FaChair', 'FaDoorOpen', 'FaLightbulb', 'FaFan'
+    ],
+    'Comodidades': [
+        'FaWifi', 'FaSnowflake', 'FaTv', 'FaLaptop', 'FaSatelliteDish',
+        'FaPhone', 'FaPrint'
+    ],
+    'Baño & Spa': [
+        'FaBath', 'FaShower', 'FaWater', 'FaSpa', 'FaHands', 'FaTemperatureHigh'
+    ],
+    'Comida & Bebida': [
+        'FaCoffee', 'FaUtensils', 'FaWineGlass', 'FaGlassMartini', 'FaCocktail', 'FaGlassCheers'
+    ],
+    'Actividades': [
+        'FaSwimmingPool', 'FaBiking', 'FaDumbbell', 'FaMusic'
+    ],
+    'Transporte': [
+        'FaCar', 'FaParking', 'FaShuttleVan'
+    ],
+    'Entorno': [
+        'FaHome', 'FaWind', 'FaUmbrella', 'FaSun', 'FaMoon', 'FaMountain', 'FaTree', 'FaUmbrellaBeach',
+        'FaTemperatureLow'
+    ],
+    'Servicios': [
+        'FaConciergeBell', 'FaMoneyBillWave', 'FaUserShield', 'FaShieldAlt', 'FaToolbox',
+        'FaSuitcase', 'FaFirstAid'
+    ],
+    'Personas & Mascotas': [
+        'FaPaw', 'FaWheelchair', 'FaBaby', 'FaSmoking', 'FaSmokingBan'
+    ]
+};
 
 /**
- * IconSelector - Component for selecting icons for services
- * 
- * @param {Object} props
- * @param {React.Element} props.selectedIcon - Currently selected icon
- * @param {Function} props.onSelectIcon - Callback when icon is selected
- * @param {string} props.variant - Bootstrap variant for icon preview
+ * IconSelector - Componente mejorado para seleccionar un icono
  */
 const IconSelector = ({ selectedIcon, onSelectIcon, variant = 'primary' }) => {
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedIconTemp, setSelectedIconTemp] = useState(null);
-    
-    // Available icons
-    const availableIcons = [
-        { key: 'wifi', component: <Wifi size={24} />, name: 'WiFi' },
-        { key: 'coffee', component: <Coffee size={24} />, name: 'Café' },
-        { key: 'bed', component: <Bed size={24} />, name: 'Cama' },
-        { key: 'bath', component: <Bath size={24} />, name: 'Baño' },
-        { key: 'tv', component: <Tv size={24} />, name: 'Televisión' },
-        { key: 'car', component: <Car size={24} />, name: 'Coche' },
-        { key: 'bike', component: <Bike size={24} />, name: 'Bicicleta' }, // Changed from Bicycle to Bike
-        { key: 'snowflake', component: <Snowflake size={24} />, name: 'Aire Acondicionado' },
-        { key: 'utensils', component: <Utensils size={24} />, name: 'Restaurante' },
-        { key: 'map-pin', component: <MapPin size={24} />, name: 'Ubicación' },
-        { key: 'paw-print', component: <PawPrint size={24} />, name: 'Mascotas' },
-        { key: 'sun', component: <Sun size={24} />, name: 'Playa' },
-        { key: 'shirt', component: <Shirt size={24} />, name: 'Lavandería' },
-        { key: 'wine', component: <Wine size={24} />, name: 'Bar' },
-        { key: 'message-square', component: <MessageSquare size={24} />, name: 'Mensajes' },
-        { key: 'waves', component: <Waves size={24} />, name: 'Piscina' },
-        { key: 'lock', component: <Lock size={24} />, name: 'Seguridad' },
-        { key: 'parking', component: <ParkingIcon size={24} />, name: 'Estacionamiento' }, // Using ParkingIcon alias
-        { key: 'baby', component: <Baby size={24} />, name: 'Bebés' },
-        { key: 'fan', component: <Fan size={24} />, name: 'Ventilador' },
-        { key: 'dumbbell', component: <Dumbbell size={24} />, name: 'Gimnasio' },
-        { key: 'bell', component: <Bell size={24} />, name: 'Recepción' },
-        { key: 'shower-head', component: <ShowerHead size={24} />, name: 'Ducha' },
-        { key: 'computer', component: <Computer size={24} />, name: 'Computadora' },
-        { key: 'phone', component: <Phone size={24} />, name: 'Teléfono' },
-        { key: 'globe', component: <Globe size={24} />, name: 'Internet' },
-        { key: 'bus', component: <Bus size={24} />, name: 'Transporte' }
-    ];
-    
-    // Filter icons based on search term
-    const filteredIcons = searchTerm.trim() === '' 
-        ? availableIcons 
-        : availableIcons.filter(icon => 
-            icon.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    
-    // Open icon selector modal
-    const openIconSelector = () => {
-        setSelectedIconTemp(selectedIcon);
-        setShowModal(true);
+    const [activeCategory, setActiveCategory] = useState('Todos');
+
+    // Filtrar íconos por el término de búsqueda y categoría
+    const getFilteredIcons = () => {
+        let iconKeys = Object.keys(availableIcons);
+
+        // Filtrar por categoría si no es "Todos"
+        if (activeCategory !== 'Todos') {
+            iconKeys = iconCategories[activeCategory] || [];
+        }
+
+        // Filtrar por término de búsqueda
+        if (searchTerm) {
+            return iconKeys.filter(iconName =>
+                iconName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        return iconKeys;
     };
-    
-    // Close icon selector modal
-    const closeIconSelector = () => {
-        setSelectedIconTemp(null);
-        setSearchTerm('');
-        setShowModal(false);
+
+    // Obtener el componente de ícono actual
+    const getCurrentIcon = () => {
+        if (typeof selectedIcon === 'string' && availableIcons[selectedIcon]) {
+            const IconComponent = availableIcons[selectedIcon];
+            return <IconComponent size={24} />;
+        }
+
+        // Si no hay ícono seleccionado o es inválido, mostrar un ícono predeterminado
+        return <FaBed size={24} />;
     };
-    
-    // Handle confirm icon selection
-    const handleConfirmSelection = () => {
-        onSelectIcon(selectedIconTemp);
-        closeIconSelector();
-    };
-    
-    // Find the currently selected icon from the list
-    const findSelectedIcon = () => {
-        if (!selectedIcon) return null;
-        
-        // Try to match the icon by comparing the type name
-        const selectedType = selectedIcon.type?.name;
-        return availableIcons.find(icon => 
-            icon.component.type?.name === selectedType
-        );
-    };
-    
-    // Get display for the selected icon
-    const selectedIconDisplay = findSelectedIcon() || { name: 'Ninguno', component: null };
-    
+
+    const filteredIcons = getFilteredIcons();
+
     return (
         <>
-            <div className="icon-selector">
-                <Button 
-                    variant="outline-secondary" 
-                    onClick={openIconSelector}
-                    className="d-flex justify-content-between align-items-center w-100"
+            <div className="d-flex align-items-center">
+                <div
+                    className="icon-preview me-2 d-flex align-items-center justify-content-center"
+                    style={{
+                        width: '46px',
+                        height: '46px',
+                        backgroundColor: `var(--bs-${variant})15`,
+                        borderRadius: '8px',
+                        border: `2px solid var(--bs-${variant})25`
+                    }}
                 >
-                    <div className="d-flex align-items-center">
-                        {selectedIcon ? (
-                            <>
-                                <div className={`icon-preview bg-${variant} bg-opacity-10 me-2`}>
-                                    {React.cloneElement(selectedIcon, { size: 20 })}
-                                </div>
-                                <span>{selectedIconDisplay.name}</span>
-                            </>
-                        ) : (
-                            <>
-                                <Settings size={20} className="me-2" />
-                                <span>Seleccionar ícono</span>
-                            </>
-                        )}
-                    </div>
-                    <span className="small text-muted">Cambiar</span>
+                    {getCurrentIcon()}
+                </div>
+                <div className="flex-grow-1">
+                    <Form.Control
+                        type="text"
+                        value={selectedIcon || ''}
+                        placeholder="No hay ícono seleccionado"
+                        disabled
+                        className="bg-white"
+                    />
+                </div>
+                <Button
+                    variant="outline-primary"
+                    className="ms-2 d-flex align-items-center"
+                    onClick={() => setShowModal(true)}
+                >
+                    Seleccionar
                 </Button>
             </div>
-            
-            <Modal 
-                show={showModal} 
-                onHide={closeIconSelector} 
-                size="lg" 
+
+            <Modal
+                show={showModal}
+                onHide={() => setShowModal(false)}
+                size="xl"
                 centered
                 className="icon-selector-modal"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Seleccionar Ícono</Modal.Title>
+                    <Modal.Title>
+                        <div className="d-flex align-items-center">
+                            <div className="me-2">Seleccionar ícono</div>
+                            {selectedIcon && (
+                                <Badge
+                                    bg="light"
+                                    text="dark"
+                                    className="px-2 py-1 d-flex align-items-center"
+                                >
+                                    {getCurrentIcon()}
+                                    <span className="ms-1">{selectedIcon}</span>
+                                </Badge>
+                            )}
+                        </div>
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <InputGroup className="mb-4">
-                        <InputGroup.Text>
+                    {/* Buscador de iconos */}
+                    <InputGroup className="mb-3 shadow-sm">
+                        <InputGroup.Text className="bg-light">
                             <Search size={18} />
                         </InputGroup.Text>
                         <Form.Control
-                            placeholder="Buscar íconos..."
+                            type="text"
+                            placeholder="Buscar iconos por nombre..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            autoFocus
+                            className="border-start-0"
                         />
                         {searchTerm && (
-                            <Button 
-                                variant="outline-secondary" 
+                            <Button
+                                variant="outline-secondary"
                                 onClick={() => setSearchTerm('')}
                             >
-                                <X size={18} />
+                                <X size={16} />
                             </Button>
                         )}
                     </InputGroup>
-                    
-                    <div className="icon-grid">
-                        <Row xs={3} sm={4} md={6} lg={8} className="g-3">
-                            {filteredIcons.map(icon => (
-                                <Col key={icon.key}>
-                                    <div 
-                                        className={`icon-item ${selectedIconTemp && selectedIconTemp.type?.name === icon.component.type?.name ? 'selected' : ''}`}
-                                        onClick={() => setSelectedIconTemp(icon.component)}
-                                    >
-                                        <div className="icon-container">
-                                            {icon.component}
-                                            {selectedIconTemp && selectedIconTemp.type?.name === icon.component.type?.name && (
-                                                <div className="selected-indicator">
-                                                    <CheckCircle size={16} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="icon-name">{icon.name}</div>
-                                    </div>
-                                </Col>
-                            ))}
-                        </Row>
-                        
-                        {filteredIcons.length === 0 && (
-                            <div className="text-center py-4">
-                                <Search size={40} className="text-muted mb-2" />
-                                <p>No se encontraron íconos que coincidan con "{searchTerm}"</p>
-                                <Button 
-                                    variant="outline-primary" 
-                                    size="sm"
-                                    onClick={() => setSearchTerm('')}
+
+                    {/* Navegación por categorías */}
+                    <Nav
+                        variant="pills"
+                        className="flex-nowrap mb-3 overflow-auto pb-2 category-nav"
+                        style={{ whiteSpace: 'nowrap' }}
+                    >
+                        <Nav.Item>
+                            <Nav.Link
+                                active={activeCategory === 'Todos'}
+                                onClick={() => setActiveCategory('Todos')}
+                                className="icon-category-link"
+                            >
+                                Todos
+                            </Nav.Link>
+                        </Nav.Item>
+                        {Object.keys(iconCategories).map(category => (
+                            <Nav.Item key={category}>
+                                <Nav.Link
+                                    active={activeCategory === category}
+                                    onClick={() => setActiveCategory(category)}
+                                    className="icon-category-link"
                                 >
-                                    Mostrar todos los íconos
+                                    {category}
+                                </Nav.Link>
+                            </Nav.Item>
+                        ))}
+                    </Nav>
+
+                    {/* Contenedor de iconos */}
+                    <div className="icons-container mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        {filteredIcons.length === 0 ? (
+                            <div className="text-center my-5 text-muted">
+                                <Search size={48} className="mb-3 opacity-50" />
+                                <p>No se encontraron íconos que coincidan con la búsqueda</p>
+                                <Button
+                                    variant="outline-secondary"
+                                    size="sm"
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                        setActiveCategory('Todos');
+                                    }}
+                                >
+                                    Limpiar búsqueda
                                 </Button>
                             </div>
+                        ) : (
+                            <Row className="g-3 icon-grid">
+                                {filteredIcons.map(iconName => {
+                                    const IconComponent = availableIcons[iconName];
+                                    const isSelected = selectedIcon === iconName;
+
+                                    return (
+                                        <Col xs={4} sm={3} md={2} key={iconName}>
+                                            <div
+                                                className={`icon-item text-center p-2 rounded ${isSelected ? 'selected' : ''}`}
+                                                onClick={() => {
+                                                    onSelectIcon(iconName);
+                                                    setShowModal(false);
+                                                }}
+                                            >
+                                                <div className="position-relative mb-2">
+                                                    <div
+                                                        className="d-flex align-items-center justify-content-center mx-auto"
+                                                        style={{
+                                                            width: '48px',
+                                                            height: '48px',
+                                                            backgroundColor: `var(--bs-${variant})20`,
+                                                            borderRadius: '8px',
+                                                            border: isSelected ? `2px solid var(--bs-${variant})` : `1px solid var(--bs-${variant})20`
+                                                        }}
+                                                    >
+                                                        <IconComponent size={24} color={isSelected ? `var(--bs-${variant})` : "#555"} />
+                                                    </div>
+                                                    {isSelected && (
+                                                        <div
+                                                            className="position-absolute bottom-0 end-0 d-flex align-items-center justify-content-center"
+                                                            style={{
+                                                                width: '18px',
+                                                                height: '18px',
+                                                                backgroundColor: 'var(--bs-success)',
+                                                                borderRadius: '50%',
+                                                                transform: 'translate(25%, 25%)',
+                                                                border: '2px solid white'
+                                                            }}
+                                                        >
+                                                            <Check size={10} color="white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div
+                                                    className={`small text-truncate ${isSelected ? 'fw-semibold text-primary' : 'text-muted'}`}
+                                                    style={{ fontSize: '10px' }}
+                                                >
+                                                    {iconName}
+                                                </div>
+                                            </div>
+                                        </Col>
+                                    );
+                                })}
+                            </Row>
                         )}
                     </div>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="outline-secondary" onClick={closeIconSelector}>
+                <Modal.Footer className="justify-content-between">
+                    <div>
+                        <small className="text-muted">Mostrando {filteredIcons.length} de {Object.keys(availableIcons).length} iconos disponibles</small>
+                    </div>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
                         Cancelar
-                    </Button>
-                    <Button 
-                        variant="primary" 
-                        onClick={handleConfirmSelection}
-                        disabled={!selectedIconTemp}
-                    >
-                        Seleccionar
                     </Button>
                 </Modal.Footer>
             </Modal>

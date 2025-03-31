@@ -1,70 +1,135 @@
 import React from 'react';
-import { Card, Button, Badge } from 'react-bootstrap';
-import { Settings, Edit, Trash } from 'lucide-react';
+import { Card, Badge, Button } from 'react-bootstrap';
+import { Edit, Trash2, CheckCircle, XCircle, Layers } from 'lucide-react';
+// Importar iconos de Font Awesome
+import * as FaIcons from 'react-icons/fa';
+// Importar iconos de Material Design
+import * as MdIcons from 'react-icons/md';
+// Importar iconos de IonIcons
+import * as IoIcons from 'react-icons/io5';
+
+// Función auxiliar para obtener el componente de icono
+const getIconComponent = (iconName) => {
+    if (typeof iconName !== 'string') return null;
+
+    // Comprobar en diferentes librerías
+    if (iconName.startsWith('Fa') && FaIcons[iconName]) {
+        return FaIcons[iconName];
+    }
+
+    if (iconName.startsWith('Md') && MdIcons[iconName]) {
+        return MdIcons[iconName];
+    }
+
+    if (iconName.startsWith('Io') && IoIcons[iconName]) {
+        return IoIcons[iconName];
+    }
+
+    return null;
+};
 
 /**
- * ServiceCard - Displays a service in card format
- * 
- * @param {Object} props
- * @param {Object} props.service - Service object to display
- * @param {Function} props.onEdit - Function to call when edit button is clicked
- * @param {Function} props.onDelete - Function to call when delete button is clicked
+ * ServiceCard - Card component for displaying a service
  */
-const ServiceCard = ({ service, onEdit, onDelete }) => {
+const ServiceCard = ({ service, onEdit, onDelete, onToggle }) => {
+    // Renderizar el icono apropiado
+    const renderIcon = () => {
+        // Obtener el componente de icono
+        const IconComponent = getIconComponent(service.icono);
+
+        if (IconComponent) {
+            return <IconComponent size={24} className="text-white" />;
+        }
+
+        // Si no se puede obtener el icono, usar icono por defecto
+        return <Layers size={24} className="text-white" />;
+    };
+
     return (
-        <Card className="service-card h-100 border-0 shadow-sm">
-            <Card.Header className={`bg-${service.variante || 'primary'} bg-opacity-10 d-flex justify-content-between align-items-center`}>
-                <Badge bg={service.variante || 'primary'}>
-                    {service.variante || 'primary'}
-                </Badge>
-                <div className="service-actions">
-                    <Button 
-                        variant="light" 
-                        size="sm" 
-                        className="btn-icon"
-                        onClick={onEdit}
-                    >
-                        <Edit size={16} />
-                    </Button>
-                    <Button 
-                        variant="light" 
-                        size="sm" 
-                        className="btn-icon ms-1"
-                        onClick={onDelete}
-                    >
-                        <Trash size={16} />
-                    </Button>
-                </div>
-            </Card.Header>
+        <Card className="service-card h-100 shadow-sm border-0 overflow-hidden">
+            {/* Barra superior decorativa del color de la variante */}
+            <div
+                className="card-badge"
+                style={{
+                    backgroundColor: service.variante ? `var(--bs-${service.variante})` : 'var(--bs-primary)'
+                }}
+            />
+
             <Card.Body className="d-flex flex-column">
-                <div className="service-icon-wrapper mb-3">
-                    <div className={`service-icon-bg bg-${service.variante || 'primary'} bg-opacity-10`}>
-                        {service.icono && React.isValidElement(service.icono) 
-                            ? React.cloneElement(service.icono, { size: 32 }) 
-                            : <Settings size={32} className={`text-${service.variante || 'primary'}`} />}
+                {/* Badge estado (activo/inactivo) */}
+                <div className="position-absolute top-0 end-0 m-2">
+                    <Badge
+                        bg={service.habilitado ? 'success' : 'secondary'}
+                        className="rounded-pill px-2 py-1 d-flex align-items-center"
+                    >
+                        {service.habilitado ?
+                            <><CheckCircle size={12} className="me-1" /> Activo</> :
+                            <><XCircle size={12} className="me-1" /> Inactivo</>
+                        }
+                    </Badge>
+                </div>
+
+                {/* Contenido principal del servicio */}
+                <div className="text-center mb-3 mt-2">
+                    <div className="service-icon-wrapper">
+                        <div
+                            className="service-icon-bg"
+                            style={{
+                                backgroundColor: service.variante ? `var(--bs-${service.variante})` : 'var(--bs-primary)'
+                            }}
+                        >
+                            {renderIcon()}
+                        </div>
+                    </div>
+
+                    <h5 className="service-title">
+                        {service.etiqueta}
+                    </h5>
+
+                    <Badge
+                        bg="light"
+                        text="dark"
+                        className="mb-2 service-code px-2 py-1"
+                    >
+                        {service.valor}
+                    </Badge>
+
+                    <Card.Text className="service-description">
+                        {service.descripcion}
+                    </Card.Text>
+                </div>
+
+                {/* Footer con precio y acciones */}
+                <div className="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                    <Badge
+                        bg={service.variante || 'primary'}
+                        className="px-3 py-2 d-flex align-items-center"
+                    >
+                        ${service.precio?.toFixed(2) || '0.00'}
+                    </Badge>
+
+                    <div className="service-actions">
+                        <Button
+                            variant="outline-primary"
+                            size="sm"
+                            className="btn-icon me-2"
+                            onClick={onEdit}
+                            title="Editar servicio"
+                        >
+                            <Edit size={15} />
+                        </Button>
+                        <Button
+                            variant="outline-danger"
+                            size="sm"
+                            className="btn-icon"
+                            onClick={onDelete}
+                            title="Eliminar servicio"
+                        >
+                            <Trash2 size={15} />
+                        </Button>
                     </div>
                 </div>
-                <h5 className="service-title mb-2">{service.etiqueta}</h5>
-                <div className="service-value mb-2">
-                    <code className="bg-light px-2 py-1 rounded">
-                        {service.valor}
-                    </code>
-                </div>
-                <p className="service-description text-muted mb-0 flex-grow-1 small">
-                    {service.descripcion || 'Sin descripción'}
-                </p>
             </Card.Body>
-            <Card.Footer className="bg-white border-top pt-0">
-                <div className="d-grid gap-2">
-                    <Button 
-                        variant="outline-primary" 
-                        size="sm"
-                        onClick={onEdit}
-                    >
-                        Editar Servicio
-                    </Button>
-                </div>
-            </Card.Footer>
         </Card>
     );
 };
