@@ -7,6 +7,7 @@ import ContactSection from '../../components/home/ui/ContactSection'; */
 function Home() {
   return (
     <div className="home-page">
+      
       <Hero />
       
       {/* You can uncomment these components as they are implemented */}

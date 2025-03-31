@@ -17,6 +17,7 @@ import Test from './pages/test/TestPage';
 function App() {
   return (
     <AuthProvider>
+      
       <Router>
         <div className="d-flex flex-column min-vh-100">
           {/* <BarraNav /> */}
