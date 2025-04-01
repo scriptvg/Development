@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { ArrowRight, MapPin, Star } from 'lucide-react';
-import heroimg from '../../../assets/img/475382133_1016713003818433_3614689992057952440_n.jpg';
+import heroimg from './../';
 import '../styles/card-img-home.css';
 
 const features = [
